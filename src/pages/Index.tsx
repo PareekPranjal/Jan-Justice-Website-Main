@@ -6,32 +6,34 @@ import FeatureCard from "@/components/home/FeatureCard";
 import JobsTable from "@/components/home/JobsTable";
 import CourseCard from "@/components/home/CourseCard";
 import ConsultantSection from "@/components/home/ConsultantSection";
+import { ArrowRight, Star, Users, Award, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const features = [
     {
       icon: "work",
       title: "Job Vacancies",
-      description: "Find your next legal role from top firms and companies.",
+      description: "Find your next legal role from top firms and companies worldwide.",
       href: "/jobs",
     },
     {
       icon: "menu_book",
       title: "Legal Courses",
-      description: "Upskill with certified classes and legal workshops.",
+      description: "Upskill with certified classes and workshops from industry experts.",
       href: "/courses",
     },
     {
       icon: "account_circle",
       title: "Consultancy",
-      description: "Book a session with a legal expert for career advice.",
+      description: "Book a session with a legal expert for personalized career advice.",
       href: "/appointment",
     },
   ];
 
   const courses = [
     {
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCGLdp2t9Kauult0IeoBCyPo1tbJSUbRKyeN6WO1IhajZ8JuYiwULMzXrRm7SrfMp18CQoIpEojsNVzeRzdVhUvfr7VIVmqqJ7jaiBdbKVrJ1FCTKZcEwZUtOiwHF3jGAHgK2b5Lj4wuIlL5Ulmt99n7w3HTBnscWeW87atMkIy_vNpYyPScp3rnvwmEgB_YLzHSqgiJ7OUgxE5ht26QY2tapmIlsbbr-QS5cXOO2Ips5Dc1k1hRG4e-1Ag5ZdXZ7GOwyh6CPwu-PE",
+      image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
       title: "Contract Law Fundamentals",
       description: "Master the essentials of contract drafting, negotiation, and enforcement.",
       duration: "8 Weeks",
@@ -39,7 +41,7 @@ const Index = () => {
       certified: true,
     },
     {
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBezqJdWTOzQz1Da6EJiZ9QNcqoSLvAAWD3oPLD8AGSo90iOGEQtKIoXaq03W3_-Vsq1p7s64kvw_OfCASCHif2vWobn4PGV3ALR9N0bjhEOgAxvXc9YYeUDa1dUivaRIPdMunG9fFoGOZmUTKnTjLbVZ04qWAOaKmuZ2yv_BfonFCnE1Gkz2ZKZw7EuK9IzjTWZx0x6q_Xmi3wK2hd_zr-ReHusUW1uWxmiT6_Li5RVYr1hq9rDBM20pNOEHapYFwRe4cuDHIxlAo",
+      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80",
       title: "Corporate M&A Strategies",
       description: "Learn advanced merger and acquisition tactics from industry experts.",
       duration: "12 Weeks",
@@ -47,13 +49,20 @@ const Index = () => {
       certified: true,
     },
     {
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuChhVyWogtJnymQeED-OilEw-KA3ALlGzptjQ2jNBCtuj5d2h3e8zpAs8kpehYIRSMLmmLEXuOV46S8gmo9qMciYCObOBF_uX736zYPkrKSCBizWAxEm7WbYZ2Jb8vwFh8vXFbCNRVedM2D3T1oq-KKHwwjzRP7aJIv58LrJsccLq2C15eKvsYCfpAaCt1q-6Sjo8VoJ8pkIPZt0kNqV53p3NWwDnNDtmRvJx2gfuopygAA7RPpAagi-r3KHD38pp39bsjsCacQnlM",
+      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80",
       title: "International Trade Law",
       description: "Navigate complex cross-border transactions and regulations.",
       duration: "10 Weeks",
       level: "Intermediate",
       certified: true,
     },
+  ];
+
+  const stats = [
+    { icon: Users, value: "50K+", label: "Legal Professionals" },
+    { icon: Award, value: "200+", label: "Certified Courses" },
+    { icon: Star, value: "4.9", label: "Average Rating" },
+    { icon: TrendingUp, value: "95%", label: "Success Rate" },
   ];
 
   return (
@@ -68,18 +77,63 @@ const Index = () => {
         
         <main className="flex flex-col items-center w-full">
           {/* Hero Section */}
-          <section className="w-full flex justify-center px-4 lg:px-10 py-12 lg:py-16">
-            <div className="flex flex-col max-w-[960px] flex-1 gap-12">
-              <div className="flex flex-col gap-6 text-center items-center animate-fade-in">
-                <h1 className="text-4xl md:text-5xl font-black leading-tight tracking-tight max-w-[720px]">
-                  Find Your Path in Law
+          <section className="w-full relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 -z-10">
+              <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+            </div>
+
+            <div className="container py-16 lg:py-24">
+              <div className="flex flex-col gap-8 text-center items-center max-w-4xl mx-auto">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium animate-fade-in">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Over 10,000 Legal Jobs Available
+                </div>
+                
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight tracking-tight animate-fade-in" style={{ animationDelay: "100ms" }}>
+                  Find Your Path in{" "}
+                  <span className="gradient-text">Legal Excellence</span>
                 </h1>
-                <p className="text-muted-foreground text-lg font-normal leading-relaxed max-w-[640px]">
-                  Navigate your legal career with our dedicated tools for employment, education, and expert advice.
+                
+                <p className="text-muted-foreground text-lg md:text-xl font-normal leading-relaxed max-w-2xl animate-fade-in" style={{ animationDelay: "200ms" }}>
+                  Navigate your legal career with our comprehensive platform for employment, education, and expert guidance.
                 </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "300ms" }}>
+                  <Link to="/jobs">
+                    <Button size="lg" className="h-12 px-8 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                      Explore Jobs
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link to="/courses">
+                    <Button size="lg" variant="outline" className="h-12 px-8">
+                      Browse Courses
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "400ms" }}>
+                {stats.map((stat) => (
+                  <div key={stat.label} className="flex flex-col items-center gap-2 p-6 rounded-2xl bg-card border border-border/50 shadow-soft hover:shadow-elevated transition-all duration-300">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2">
+                      <stat.icon className="h-6 w-6" />
+                    </div>
+                    <span className="text-2xl md:text-3xl font-display font-bold">{stat.value}</span>
+                    <span className="text-sm text-muted-foreground text-center">{stat.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section className="w-full py-16 bg-muted/30">
+            <div className="container">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {features.map((feature, index) => (
                   <FeatureCard key={feature.href} {...feature} delay={index * 100} />
                 ))}
@@ -88,31 +142,51 @@ const Index = () => {
           </section>
 
           {/* Latest Jobs Section */}
-          <section className="w-full flex justify-center bg-card/50 py-12 px-4 lg:px-10 border-y border-border">
-            <div className="flex flex-col max-w-[960px] flex-1 gap-6">
-              <div className="flex items-center justify-between pb-2">
-                <h2 className="text-2xl font-bold leading-tight tracking-tight">Latest Job Vacancies</h2>
-                <Link to="/jobs" className="text-sm font-bold text-primary hover:underline">
+          <section className="w-full py-16 lg:py-20">
+            <div className="container">
+              <div className="max-w-5xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-display font-bold">Latest Job Vacancies</h2>
+                    <p className="text-muted-foreground mt-1">Discover opportunities at top legal firms</p>
+                  </div>
+                  <Link to="/jobs" className="hidden sm:flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                    View all jobs
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+                <JobsTable />
+                <Link to="/jobs" className="flex sm:hidden items-center justify-center gap-2 text-sm font-semibold text-primary mt-6">
                   View all jobs
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <JobsTable />
             </div>
           </section>
 
           {/* Popular Courses Section */}
-          <section className="w-full flex justify-center px-4 lg:px-10 py-12 lg:py-16">
-            <div className="flex flex-col max-w-[960px] flex-1 gap-8">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold leading-tight tracking-tight">Popular Legal Courses</h2>
-                <Link to="/courses" className="text-sm font-bold text-primary hover:underline">
+          <section className="w-full py-16 lg:py-20 bg-muted/30">
+            <div className="container">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-display font-bold">Popular Legal Courses</h2>
+                    <p className="text-muted-foreground mt-1">Advance your skills with expert-led programs</p>
+                  </div>
+                  <Link to="/courses" className="hidden sm:flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                    Browse Catalog
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {courses.map((course, index) => (
+                    <CourseCard key={course.title} {...course} delay={index * 100} />
+                  ))}
+                </div>
+                <Link to="/courses" className="flex sm:hidden items-center justify-center gap-2 text-sm font-semibold text-primary mt-6">
                   Browse Catalog
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {courses.map((course, index) => (
-                  <CourseCard key={course.title} {...course} delay={index * 100} />
-                ))}
               </div>
             </div>
           </section>
