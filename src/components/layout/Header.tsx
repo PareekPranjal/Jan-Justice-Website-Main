@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, Briefcase, GraduationCap, Calendar, LogIn, User } from "lucide-react";
 
 interface HeaderProps {
   variant?: "default" | "minimal";
@@ -9,73 +10,115 @@ interface HeaderProps {
   showBackLink?: boolean;
 }
 
+const navigation = [
+  { name: "Jobs", href: "/jobs", icon: Briefcase },
+  { name: "Courses", href: "/courses", icon: GraduationCap },
+  { name: "Appointments", href: "/appointment", icon: Calendar },
+];
+
 const Header = ({ variant = "default", title = "LegalHub", showBackLink = false }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  const navLinks = [
-    { href: "/jobs", label: "Jobs" },
-    { href: "/courses", label: "Courses" },
-    { href: "/appointment", label: "Appointments" },
-  ];
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-10">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <span className="material-symbols-outlined text-2xl">gavel</span>
-            </div>
-            <h2 className="text-xl font-bold leading-tight tracking-tight">{title}</h2>
-          </Link>
-        </div>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow transition-all duration-300 group-hover:shadow-glow-lg group-hover:scale-105">
+            <span className="text-xl font-display font-bold text-primary-foreground">L</span>
+          </div>
+          <span className="font-display text-xl font-bold tracking-tight group-hover:text-primary transition-colors">
+            {title}
+          </span>
+        </Link>
 
         {variant === "default" && (
           <>
             {/* Desktop Navigation */}
-            <div className="hidden md:flex flex-1 justify-end gap-8 items-center">
-              <nav className="flex items-center gap-8">
-                {navLinks.map((link) => (
+            <nav className="hidden md:flex items-center gap-1">
+              {navigation.map((item) => {
+                const active = isActive(item.href);
+                return (
                   <Link
-                    key={link.href}
-                    to={link.href}
-                    className={`text-sm font-medium transition-colors hover:text-primary ${
-                      isActive(link.href) ? "text-primary" : "text-foreground"
+                    key={item.name}
+                    to={item.href}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
                     }`}
                   >
-                    {link.label}
+                    <item.icon className="h-4 w-4" />
+                    {item.name}
                   </Link>
-                ))}
-              </nav>
-              <Button className="px-6">Login</Button>
+                );
+              })}
+            </nav>
+
+            {/* Desktop Auth */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+              <Link to="/profile">
+                <Button size="sm" className="gap-2 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                  <User className="h-4 w-4" />
+                  Profile
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <button className="p-2 text-foreground">
-                  <span className="material-symbols-outlined">menu</span>
-                </button>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-72">
-                <nav className="flex flex-col gap-4 mt-8">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      to={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`text-lg font-medium py-2 transition-colors hover:text-primary ${
-                        isActive(link.href) ? "text-primary" : "text-foreground"
-                      }`}
-                    >
-                      {link.label}
+              <SheetContent side="right" className="w-80">
+                <div className="flex flex-col gap-6 mt-8">
+                  <nav className="flex flex-col gap-2">
+                    {navigation.map((item) => {
+                      const active = isActive(item.href);
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                            active
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          }`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.name}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                  
+                  <div className="border-t pt-6 flex flex-col gap-3">
+                    <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full gap-2">
+                        <LogIn className="h-4 w-4" />
+                        Login
+                      </Button>
                     </Link>
-                  ))}
-                  <Button className="mt-4 w-full">Login</Button>
-                </nav>
+                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full gap-2 gradient-primary border-0">
+                        <User className="h-4 w-4" />
+                        Profile
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </>
@@ -86,8 +129,7 @@ const Header = ({ variant = "default", title = "LegalHub", showBackLink = false 
             to="/"
             className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
-            <span className="material-symbols-outlined text-lg">arrow_back</span>
-            Back to Home
+            ← Back to Home
           </Link>
         )}
       </div>
