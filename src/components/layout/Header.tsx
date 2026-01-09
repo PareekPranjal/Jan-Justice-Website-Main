@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Briefcase, GraduationCap, Calendar, LogIn, User } from "lucide-react";
+import { Menu, Home, Briefcase, GraduationCap, Calendar, LogIn, User } from "lucide-react";
 
 interface HeaderProps {
   variant?: "default" | "minimal";
@@ -11,6 +11,7 @@ interface HeaderProps {
 }
 
 const navigation = [
+  { name: "Home", href: "/", icon: Home },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
   { name: "Courses", href: "/courses", icon: GraduationCap },
   { name: "Appointments", href: "/appointment", icon: Calendar },
