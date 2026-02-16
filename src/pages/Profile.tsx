@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import {
+  userApi,
+  appointmentApi,
+  type User as UserType,
+  type UserStats,
+  type SavedJob,
+  type EnrolledCourse,
+  type Appointment,
+} from "@/lib/api";
 import {
   User,
   Mail,
@@ -34,47 +45,240 @@ import {
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const user = {
-    name: "Sarah Johnson",
-    email: "sarah.johnson@example.com",
-    phone: "+1 (555) 123-4567",
-    location: "New York, NY",
-    title: "Senior Corporate Attorney",
-    company: "Sullivan & Cromwell LLP",
-    joinedDate: "January 2024",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+  // For now, use a hardcoded email - in production this would come from auth context
+  const userEmail = "sarah.johnson@example.com";
+
+  // Form state for editing
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    location: "",
+    title: "",
+    company: "",
+  });
+
+  // Fetch user profile
+  const { data: user, isLoading: isLoadingUser } = useQuery({
+    queryKey: ['userProfile', userEmail],
+    queryFn: () => userApi.getUserProfile(userEmail),
+    retry: false,
+  });
+
+  // Fetch user stats
+  const { data: userStats, isLoading: isLoadingStats } = useQuery({
+    queryKey: ['userStats', userEmail],
+    queryFn: () => userApi.getUserStats(userEmail),
+    enabled: !!user,
+    retry: false,
+  });
+
+  // Fetch saved jobs
+  const { data: savedJobs = [], isLoading: isLoadingSavedJobs } = useQuery({
+    queryKey: ['savedJobs', userEmail],
+    queryFn: () => userApi.getSavedJobs(userEmail),
+    enabled: !!user,
+  });
+
+  // Fetch enrolled courses
+  const { data: enrolledCourses = [], isLoading: isLoadingCourses } = useQuery({
+    queryKey: ['enrolledCourses', userEmail],
+    queryFn: () => userApi.getCourseEnrollments(userEmail),
+    enabled: !!user,
+  });
+
+  // Fetch upcoming appointments
+  const { data: allAppointments = [], isLoading: isLoadingAppointments } = useQuery({
+    queryKey: ['userAppointments', userEmail],
+    queryFn: () => appointmentApi.getAppointments({ email: userEmail }),
+    enabled: !!user,
+  });
+
+  // Filter for upcoming appointments only
+  const upcomingAppointments = allAppointments.filter((apt: Appointment) => {
+    const aptDate = new Date(apt.appointmentDate);
+    return aptDate >= new Date() && apt.status !== 'cancelled';
+  });
+
+  // Unsave job mutation
+  const unsaveJobMutation = useMutation({
+    mutationFn: (savedJobId: string) => userApi.unsaveJob(savedJobId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedJobs', userEmail] });
+      toast({
+        title: "Job removed",
+        description: "The job has been removed from your saved list.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove job",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: (userData: Partial<UserType> & { email: string }) =>
+      userApi.createOrUpdateProfile(userData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userEmail] });
+      setIsEditing(false);
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Initialize form data when user data is loaded
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phone: user.phone || "",
+        location: user.location || "",
+        title: user.title || "",
+        company: user.company || "",
+      });
+    }
+  }, [user]);
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  // Handle profile update
+  const handleSaveProfile = () => {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "First name and last name are required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateProfileMutation.mutate({
+      email: userEmail,
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      phone: formData.phone.trim(),
+      location: formData.location.trim(),
+      title: formData.title.trim(),
+      company: formData.company.trim(),
+    });
+  };
+
+  // Toggle edit mode
+  const toggleEditMode = () => {
+    if (isEditing) {
+      // If canceling edit, reset form data
+      if (user) {
+        setFormData({
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          phone: user.phone || "",
+          location: user.location || "",
+          title: user.title || "",
+          company: user.company || "",
+        });
+      }
+    }
+    setIsEditing(!isEditing);
   };
 
   const stats = [
-    { label: "Courses Completed", value: 12, icon: GraduationCap },
-    { label: "Applications Sent", value: 8, icon: Briefcase },
-    { label: "Consultations", value: 3, icon: Calendar },
-    { label: "Certificates", value: 5, icon: Award },
+    { label: "Courses Completed", value: userStats?.coursesCompleted || 0, icon: GraduationCap },
+    { label: "Applications Sent", value: userStats?.applicationsSent || 0, icon: Briefcase },
+    { label: "Consultations", value: userStats?.consultations || 0, icon: Calendar },
+    { label: "Certificates", value: userStats?.certificates || 0, icon: Award },
   ];
 
-  const savedJobs = [
-    { id: 1, title: "Senior Legal Counsel", company: "Google", location: "Mountain View, CA", saved: "2 days ago" },
-    { id: 2, title: "M&A Associate", company: "Skadden LLP", location: "New York, NY", saved: "5 days ago" },
-    { id: 3, title: "IP Attorney", company: "Apple Inc.", location: "Cupertino, CA", saved: "1 week ago" },
-  ];
+  const isLoading = isLoadingUser || isLoadingStats;
 
-  const enrolledCourses = [
-    { id: 1, title: "Advanced Contract Drafting", progress: 75, instructor: "Prof. James Mitchell", image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=80" },
-    { id: 2, title: "M&A Due Diligence Masterclass", progress: 45, instructor: "Sarah Chen, Partner", image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=80" },
-    { id: 3, title: "Corporate Governance Essentials", progress: 100, instructor: "Dr. Robert Williams", image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80" },
-  ];
+  if (isLoading) {
+    return (
+      <>
+        <Helmet>
+          <title>My Profile | Jan Justice</title>
+        </Helmet>
+        <div className="bg-background min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-grow flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+              <p className="text-muted-foreground">Loading profile...</p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </>
+    );
+  }
 
-  const upcomingAppointments = [
-    { id: 1, type: "Career Coaching", consultant: "Dr. Emily Parker", date: "Jan 15, 2026", time: "10:00 AM" },
-    { id: 2, type: "Legal Consultation", consultant: "Michael Roberts, Esq.", date: "Jan 22, 2026", time: "2:00 PM" },
-  ];
+  if (!user) {
+    return (
+      <>
+        <Helmet>
+          <title>My Profile | Jan Justice</title>
+        </Helmet>
+        <div className="bg-background min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-grow flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-muted-foreground">User profile not found.</p>
+              <p className="text-sm text-muted-foreground mt-2">Please create a profile first.</p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </>
+    );
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'today';
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 14) return '1 week ago';
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return `${Math.floor(diffDays / 30)} months ago`;
+  };
 
   return (
     <>
       <Helmet>
-        <title>My Profile | LegalHub</title>
-        <meta name="description" content="Manage your LegalHub profile, track your progress, and view your saved jobs and courses." />
+        <title>My Profile | Jan Justice</title>
+        <meta name="description" content="Manage your Jan Justice profile, track your progress, and view your saved jobs and courses." />
       </Helmet>
 
       <div className="bg-background min-h-screen flex flex-col">
@@ -92,9 +296,9 @@ const Profile = () => {
                 {/* Avatar */}
                 <div className="relative group">
                   <Avatar className="h-28 w-28 border-4 border-background shadow-elevated">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={user.avatar} alt={user.fullName || `${user.firstName} ${user.lastName}`} />
                     <AvatarFallback className="text-2xl font-display gradient-primary text-primary-foreground">
-                      {user.name.split(" ").map((n) => n[0]).join("")}
+                      {user.firstName[0]}{user.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
                   <button className="absolute bottom-0 right-0 h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
@@ -104,35 +308,142 @@ const Profile = () => {
 
                 {/* User Info */}
                 <div className="flex-1">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-                    <div>
-                      <h1 className="text-2xl md:text-3xl font-display font-bold">{user.name}</h1>
-                      <p className="text-muted-foreground">{user.title} at {user.company}</p>
-                    </div>
-                    <Button
-                      variant={isEditing ? "default" : "outline"}
-                      onClick={() => setIsEditing(!isEditing)}
-                      className="gap-2"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                      {isEditing ? "Save Changes" : "Edit Profile"}
-                    </Button>
-                  </div>
+                  {!isEditing ? (
+                    // View Mode
+                    <>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                        <div>
+                          <h1 className="text-2xl md:text-3xl font-display font-bold">{user.fullName || `${user.firstName} ${user.lastName}`}</h1>
+                          <p className="text-muted-foreground">{user.title}{user.company && ` at ${user.company}`}</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          onClick={toggleEditMode}
+                          className="gap-2"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                          Edit Profile
+                        </Button>
+                      </div>
 
-                  <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1.5">
-                      <Mail className="h-4 w-4" />
-                      {user.email}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4" />
-                      {user.location}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" />
-                      Member since {user.joinedDate}
-                    </div>
-                  </div>
+                      <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="h-4 w-4" />
+                          {user.email}
+                        </div>
+                        {user.location && (
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="h-4 w-4" />
+                            {user.location}
+                          </div>
+                        )}
+                        {user.createdAt && (
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-4 w-4" />
+                            Member since {formatDate(user.createdAt)}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    // Edit Mode
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-display font-bold">Edit Profile</h2>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={toggleEditMode}
+                            disabled={updateProfileMutation.isPending}
+                            size="sm"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={handleSaveProfile}
+                            disabled={updateProfileMutation.isPending}
+                            size="sm"
+                            className="gap-2"
+                          >
+                            {updateProfileMutation.isPending ? (
+                              <>
+                                <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Edit3 className="h-4 w-4" />
+                                Save Changes
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-card/50 p-4 rounded-xl border border-border/50">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstName" className="text-xs">First Name *</Label>
+                          <Input
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={handleInputChange}
+                            placeholder="Enter first name"
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastName" className="text-xs">Last Name *</Label>
+                          <Input
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={handleInputChange}
+                            placeholder="Enter last name"
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone" className="text-xs">Phone</Label>
+                          <Input
+                            id="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder="+1 (555) 123-4567"
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="location" className="text-xs">Location</Label>
+                          <Input
+                            id="location"
+                            value={formData.location}
+                            onChange={handleInputChange}
+                            placeholder="New York, NY"
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="title" className="text-xs">Job Title</Label>
+                          <Input
+                            id="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            placeholder="Senior Attorney"
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="company" className="text-xs">Company</Label>
+                          <Input
+                            id="company"
+                            value={formData.company}
+                            onChange={handleInputChange}
+                            placeholder="Law Firm Name"
+                            className="h-9"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -175,33 +486,48 @@ const Profile = () => {
                     <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft">
                       <div className="flex items-center justify-between mb-6">
                         <h2 className="text-lg font-display font-bold">Course Progress</h2>
-                        <Link to="/my-courses" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+                        <Link to="/courses" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
                           View all <ChevronRight className="h-4 w-4" />
                         </Link>
                       </div>
 
-                      <div className="space-y-4">
-                        {enrolledCourses.map((course) => (
-                          <div key={course.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                            <img
-                              src={course.image}
-                              alt={course.title}
-                              className="h-14 w-14 rounded-lg object-cover"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-sm truncate">{course.title}</p>
-                              <p className="text-xs text-muted-foreground">{course.instructor}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Progress value={course.progress} className="h-1.5 flex-1" />
-                                <span className="text-xs font-medium">{course.progress}%</span>
+                      {isLoadingCourses ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                          <p className="text-sm">Loading courses...</p>
+                        </div>
+                      ) : enrolledCourses.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm">No enrolled courses yet.</p>
+                          <Link to="/courses" className="text-sm text-primary mt-2 inline-block">
+                            Browse courses
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {enrolledCourses.slice(0, 3).map((course) => (
+                            <div key={course._id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                              <img
+                                src={course.image}
+                                alt={course.title}
+                                className="h-14 w-14 rounded-lg object-cover"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm truncate">{course.title}</p>
+                                <p className="text-xs text-muted-foreground">{course.instructor?.name || 'Instructor'}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Progress value={course.progress} className="h-1.5 flex-1" />
+                                  <span className="text-xs font-medium">{course.progress}%</span>
+                                </div>
                               </div>
+                              {course.progress === 100 && (
+                                <CheckCircle2 className="h-5 w-5 text-accent shrink-0" />
+                              )}
                             </div>
-                            {course.progress === 100 && (
-                              <CheckCircle2 className="h-5 w-5 text-accent shrink-0" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Saved Jobs */}
@@ -213,27 +539,44 @@ const Profile = () => {
                         </Link>
                       </div>
 
-                      <div className="space-y-3">
-                        {savedJobs.map((job) => (
-                          <div key={job.id} className="flex items-center justify-between p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                            <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-lg gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-                                {job.company.charAt(0)}
+                      {isLoadingSavedJobs ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                          <p className="text-sm">Loading saved jobs...</p>
+                        </div>
+                      ) : savedJobs.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Briefcase className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm">No saved jobs yet.</p>
+                          <Link to="/jobs" className="text-sm text-primary mt-2 inline-block">
+                            Browse jobs
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {savedJobs.slice(0, 3).map((job) => (
+                            <div key={job._id} className="flex items-center justify-between p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+                              <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-lg gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                                  {job.company.charAt(0)}
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-sm">{job.title}</p>
+                                  <p className="text-xs text-muted-foreground">{job.company} • {job.location || job.workMode}</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-semibold text-sm">{job.title}</p>
-                                <p className="text-xs text-muted-foreground">{job.company} • {job.location}</p>
+                              <div className="text-right">
+                                <p className="text-xs text-muted-foreground">Saved {formatRelativeTime(job.savedAt)}</p>
+                                <Link to={`/jobs/${job._id}`}>
+                                  <Button variant="link" size="sm" className="h-auto p-0 text-primary">
+                                    View job
+                                  </Button>
+                                </Link>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted-foreground">Saved {job.saved}</p>
-                              <Button variant="link" size="sm" className="h-auto p-0 text-primary">
-                                Apply now
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -242,33 +585,47 @@ const Profile = () => {
                     {/* Upcoming Appointments */}
                     <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft">
                       <h2 className="text-lg font-display font-bold mb-4">Upcoming Appointments</h2>
-                      
-                      <div className="space-y-4">
-                        {upcomingAppointments.map((apt) => (
-                          <div key={apt.id} className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
-                                {apt.type}
-                              </Badge>
-                            </div>
-                            <p className="font-semibold text-sm">{apt.consultant}</p>
-                            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {apt.date}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {apt.time}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
 
-                      <Button variant="outline" className="w-full mt-4">
-                        Book New Appointment
-                      </Button>
+                      {isLoadingAppointments ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
+                          <p className="text-sm">Loading...</p>
+                        </div>
+                      ) : upcomingAppointments.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm">No upcoming appointments.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {upcomingAppointments.slice(0, 2).map((apt) => (
+                            <div key={apt._id} className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                                  {apt.serviceTitle}
+                                </Badge>
+                              </div>
+                              <p className="font-semibold text-sm">{apt.clientName}</p>
+                              <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {formatDate(apt.appointmentDate)}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {apt.appointmentTime}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <Link to="/appointment">
+                        <Button variant="outline" className="w-full mt-4">
+                          Book New Appointment
+                        </Button>
+                      </Link>
                     </div>
 
                     {/* Achievements */}
@@ -297,76 +654,138 @@ const Profile = () => {
               <TabsContent value="saved-jobs" className="animate-fade-in">
                 <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft">
                   <h2 className="text-lg font-display font-bold mb-6">All Saved Jobs</h2>
-                  <div className="space-y-4">
-                    {savedJobs.map((job) => (
-                      <Link
-                        key={job.id}
-                        to="/job-detail"
-                        className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-soft transition-all"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-primary-foreground font-bold">
-                            {job.company.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-semibold">{job.title}</p>
-                            <p className="text-sm text-muted-foreground">{job.company} • {job.location}</p>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  {isLoadingSavedJobs ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+                      <p>Loading saved jobs...</p>
+                    </div>
+                  ) : savedJobs.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Briefcase className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg mb-2">No saved jobs yet</p>
+                      <p className="text-sm mb-4">Start saving jobs to keep track of opportunities</p>
+                      <Link to="/jobs">
+                        <Button>Browse Jobs</Button>
                       </Link>
-                    ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {savedJobs.map((job) => (
+                        <div
+                          key={job._id}
+                          className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-soft transition-all"
+                        >
+                          <Link to={`/jobs/${job._id}`} className="flex items-center gap-4 flex-1">
+                            <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center text-primary-foreground font-bold">
+                              {job.company.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-semibold">{job.title}</p>
+                              <p className="text-sm text-muted-foreground">{job.company} • {job.location || job.workMode}</p>
+                              <p className="text-xs text-muted-foreground mt-1">Saved {formatRelativeTime(job.savedAt)}</p>
+                            </div>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => unsaveJobMutation.mutate(job.savedJobId)}
+                            disabled={unsaveJobMutation.isPending}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="courses" className="animate-fade-in">
                 <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft">
                   <h2 className="text-lg font-display font-bold mb-6">My Enrolled Courses</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {enrolledCourses.map((course) => (
-                      <div key={course.id} className="rounded-xl border border-border/50 overflow-hidden hover:shadow-soft transition-shadow">
-                        <img src={course.image} alt={course.title} className="h-32 w-full object-cover" />
-                        <div className="p-4">
-                          <p className="font-semibold">{course.title}</p>
-                          <p className="text-sm text-muted-foreground mb-3">{course.instructor}</p>
-                          <div className="flex items-center gap-2">
-                            <Progress value={course.progress} className="h-2 flex-1" />
-                            <span className="text-sm font-medium">{course.progress}%</span>
+                  {isLoadingCourses ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+                      <p>Loading courses...</p>
+                    </div>
+                  ) : enrolledCourses.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <BookOpen className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg mb-2">No enrolled courses yet</p>
+                      <p className="text-sm mb-4">Start learning with our professional courses</p>
+                      <Link to="/courses">
+                        <Button>Browse Courses</Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {enrolledCourses.map((course) => (
+                        <div key={course._id} className="rounded-xl border border-border/50 overflow-hidden hover:shadow-soft transition-shadow">
+                          <img src={course.image} alt={course.title} className="h-32 w-full object-cover" />
+                          <div className="p-4">
+                            <p className="font-semibold">{course.title}</p>
+                            <p className="text-sm text-muted-foreground mb-3">{course.instructor?.name || 'Instructor'}</p>
+                            <div className="flex items-center gap-2">
+                              <Progress value={course.progress} className="h-2 flex-1" />
+                              <span className="text-sm font-medium">{course.progress}%</span>
+                            </div>
+                            <Link to={`/courses/${course._id}`}>
+                              <Button className="w-full mt-4" variant={course.progress === 100 ? "outline" : "default"}>
+                                {course.progress === 100 ? "View Certificate" : "Continue"}
+                              </Button>
+                            </Link>
                           </div>
-                          <Button className="w-full mt-4" variant={course.progress === 100 ? "outline" : "default"}>
-                            {course.progress === 100 ? "View Certificate" : "Continue"}
-                          </Button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="appointments" className="animate-fade-in">
                 <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft">
                   <h2 className="text-lg font-display font-bold mb-6">Upcoming Appointments</h2>
-                  <div className="space-y-4">
-                    {upcomingAppointments.map((apt) => (
-                      <div key={apt.id} className="flex items-center justify-between p-4 rounded-xl border border-border/50">
-                        <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                            <Calendar className="h-6 w-6 text-primary" />
+                  {isLoadingAppointments ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+                      <p>Loading appointments...</p>
+                    </div>
+                  ) : upcomingAppointments.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Calendar className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg mb-2">No upcoming appointments</p>
+                      <p className="text-sm mb-4">Schedule a consultation with our experts</p>
+                      <Link to="/appointment">
+                        <Button>Book Appointment</Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {upcomingAppointments.map((apt) => (
+                        <div key={apt._id} className="flex items-center justify-between p-4 rounded-xl border border-border/50">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                              <Calendar className="h-6 w-6 text-primary" />
+                            </div>
+                            <div>
+                              <Badge variant="secondary" className="mb-1">{apt.serviceTitle}</Badge>
+                              <p className="font-semibold">{apt.clientName}</p>
+                              <p className="text-sm text-muted-foreground">{formatDate(apt.appointmentDate)} at {apt.appointmentTime}</p>
+                              <p className="text-xs text-muted-foreground mt-1">Confirmation: {apt.confirmationNumber}</p>
+                            </div>
                           </div>
-                          <div>
-                            <Badge variant="secondary" className="mb-1">{apt.type}</Badge>
-                            <p className="font-semibold">{apt.consultant}</p>
-                            <p className="text-sm text-muted-foreground">{apt.date} at {apt.time}</p>
+                          <div className="flex gap-2">
+                            <Badge
+                              variant={apt.status === 'confirmed' ? 'default' : 'secondary'}
+                              className="capitalize"
+                            >
+                              {apt.status}
+                            </Badge>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Reschedule</Button>
-                          <Button size="sm" className="gradient-primary border-0">Join</Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
@@ -376,31 +795,91 @@ const Profile = () => {
                     {/* Profile Settings */}
                     <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft">
                       <h2 className="text-lg font-display font-bold mb-6">Profile Settings</h2>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name</Label>
-                          <Input id="firstName" defaultValue="Sarah" />
+                          <Label htmlFor="firstName">First Name *</Label>
+                          <Input
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={handleInputChange}
+                            placeholder="Enter first name"
+                          />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <Input id="lastName" defaultValue="Johnson" />
+                          <Label htmlFor="lastName">Last Name *</Label>
+                          <Input
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={handleInputChange}
+                            placeholder="Enter last name"
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" defaultValue={user.email} />
+                          <Input id="email" type="email" value={user.email} disabled className="bg-muted" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="phone">Phone</Label>
-                          <Input id="phone" defaultValue={user.phone} />
+                          <Input
+                            id="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            placeholder="+1 (555) 123-4567"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="title">Job Title</Label>
+                          <Input
+                            id="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            placeholder="Senior Attorney"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="company">Company</Label>
+                          <Input
+                            id="company"
+                            value={formData.company}
+                            onChange={handleInputChange}
+                            placeholder="Law Firm Name"
+                          />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                           <Label htmlFor="location">Location</Label>
-                          <Input id="location" defaultValue={user.location} />
+                          <Input
+                            id="location"
+                            value={formData.location}
+                            onChange={handleInputChange}
+                            placeholder="New York, NY"
+                          />
                         </div>
                       </div>
 
-                      <Button className="mt-6 gradient-primary border-0">Save Changes</Button>
+                      <div className="flex gap-3 mt-6">
+                        <Button
+                          onClick={handleSaveProfile}
+                          disabled={updateProfileMutation.isPending}
+                          className="gradient-primary border-0"
+                        >
+                          {updateProfileMutation.isPending ? (
+                            <>
+                              <span className="material-symbols-outlined animate-spin mr-2 text-sm">refresh</span>
+                              Saving...
+                            </>
+                          ) : (
+                            'Save Changes'
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={toggleEditMode}
+                          disabled={updateProfileMutation.isPending}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </div>
                   </div>
 

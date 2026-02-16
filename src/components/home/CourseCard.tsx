@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Clock, Award } from "lucide-react";
 
 interface CourseCardProps {
+  id?: string;
   image: string;
   title: string;
   description: string;
@@ -11,20 +12,29 @@ interface CourseCardProps {
   delay?: number;
 }
 
-const CourseCard = ({ 
-  image, 
-  title, 
-  description, 
-  duration, 
-  level, 
+const CourseCard = ({
+  id,
+  image,
+  title,
+  description,
+  duration,
+  level,
   certified = false,
-  delay = 0 
+  delay = 0
 }: CourseCardProps) => {
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    if (id) {
+      navigate(`/courses/${id}`);
+    } else {
+      navigate("/courses");
+    }
+  };
+
   return (
     <div
-      onClick={() => navigate("/course-detail")}
+      onClick={handleClick}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card shadow-soft hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 cursor-pointer animate-fade-in"
       style={{ animationDelay: `${delay}ms` }}
     >

@@ -53,8 +53,8 @@ const Login = () => {
   return (
     <>
       <Helmet>
-        <title>{view === "login" ? "Login" : "Reset Password"} | LegalHub</title>
-        <meta name="description" content="Sign in to your LegalHub account to access jobs, courses, and consultations." />
+        <title>{view === "login" ? "Login" : "Reset Password"} | Jan Justice</title>
+        <meta name="description" content="Sign in to your Jan Justice account to access jobs, courses, and consultations." />
       </Helmet>
 
       <div className="min-h-screen flex">
@@ -68,7 +68,7 @@ const Login = () => {
               <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <span className="text-2xl font-display font-bold">L</span>
               </div>
-              <span className="font-display text-2xl font-bold">LegalHub</span>
+              <span className="font-display text-2xl font-bold">Jan Justice</span>
             </Link>
 
             <div className="max-w-md">
@@ -106,7 +106,7 @@ const Login = () => {
               <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
                 <span className="text-xl font-display font-bold text-primary-foreground">L</span>
               </div>
-              <span className="font-display text-xl font-bold">LegalHub</span>
+              <span className="font-display text-xl font-bold">Jan Justice</span>
             </Link>
 
             {view === "login" && (

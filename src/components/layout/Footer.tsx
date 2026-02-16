@@ -14,9 +14,9 @@ const footerLinks = {
     { name: "Terms of Service", href: "/terms" },
   ],
   contact: [
-    { icon: Mail, text: "hello@legalhub.com" },
-    { icon: Phone, text: "+1 (555) 123-4567" },
-    { icon: MapPin, text: "New York, NY" },
+    { icon: Mail, text: "contact@janjustice.in" },
+    { icon: Phone, text: "+91 98765 43210" },
+    { icon: MapPin, text: "Jaipur, Rajasthan, India" },
   ],
 };
 
@@ -34,13 +34,11 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
-                <span className="text-xl font-display font-bold text-primary-foreground">L</span>
-              </div>
-              <span className="font-display text-xl font-bold">LegalHub</span>
+              <img src="/images/iconAndLogo.jpg" alt="Jan Justice Logo" className="h-10 object-contain" />
+              <span className="font-display text-xl font-bold">Jan Justice</span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Empowering legal careers through opportunities, learning, and expert guidance. Your journey to success starts here.
+              India's trusted platform for legal job vacancies, law courses, and expert career guidance. Your journey in law starts here.
             </p>
             <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
@@ -107,19 +105,31 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} LegalHub. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Privacy
+        <div className="mt-12 pt-8 border-t border-border/40 flex flex-col items-center gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Jan Justice. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Privacy
+              </a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Terms
+              </a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Cookies
+              </a>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Designed, Developed & Managed by</span>
+            <a href="https://www.adrologic.com/" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline transition-colors">
+              Adrologic Private Limited
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Terms
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Cookies
+            <span>|</span>
+            <a href="https://www.adrologic.com/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+              www.adrologic.com
             </a>
           </div>
         </div>

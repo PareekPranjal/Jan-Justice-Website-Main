@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Bookmark, Calendar } from "lucide-react";
+import { useSavedJobs } from "@/hooks/use-saved-jobs";
 
 interface JobCardProps {
   id: string;
@@ -7,14 +9,33 @@ interface JobCardProps {
   company: string;
   department: string;
   description: string;
+  postDate?: string;
 }
 
-const JobCard = ({ id, title, company, department, description }: JobCardProps) => {
+const JobCard = ({ id, title, company, department, description, postDate }: JobCardProps) => {
   const navigate = useNavigate();
+  const { isJobSaved, toggleSaveJob } = useSavedJobs();
+  const saved = isJobSaved(id);
 
   return (
-    <article className="group bg-card border border-border rounded-xl p-5 lg:p-6 hover:shadow-card-hover transition-all duration-300 flex flex-col gap-4">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+    <article className="group relative bg-card border border-border rounded-xl p-5 lg:p-6 hover:shadow-card-hover transition-all duration-300 flex flex-col gap-4">
+      {/* Bookmark button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleSaveJob(id);
+        }}
+        className={`absolute top-4 right-4 h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-200 ${
+          saved
+            ? 'bg-primary/10 text-primary'
+            : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground'
+        }`}
+        title={saved ? "Remove from saved" : "Save job"}
+      >
+        <Bookmark className={`h-4 w-4 ${saved ? 'fill-current' : ''}`} />
+      </button>
+
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 pr-10">
         <div className="flex-1">
           <div className="flex flex-wrap gap-2 mb-2">
             <span className="badge-info">{department}</span>
@@ -26,12 +47,18 @@ const JobCard = ({ id, title, company, department, description }: JobCardProps) 
       <div className="text-sm text-muted-foreground leading-relaxed pt-4 mt-1 border-t border-dashed border-border">
         {description}
       </div>
+      {postDate && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Calendar className="h-3.5 w-3.5" />
+          <span>Posted {new Date(postDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
-        <Button 
-          onClick={() => navigate("/job-detail")}
+        <Button
+          onClick={() => navigate(`/jobs/${id}`)}
           className="w-full sm:w-auto"
         >
-          Apply Now
+          View Details & Apply
         </Button>
       </div>
     </article>

@@ -13,11 +13,11 @@ const ConsultantSection = () => {
             Expert Guidance
           </div>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-            Meet Sarah Jenkins, <br />
-            <span className="text-primary">Senior Career Consultant</span>
+            Expert{" "}
+            <span className="text-primary">Legal Career Guidance</span>
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            With over 15 years of experience in top-tier law firms, Sarah helps aspiring attorneys navigate their career paths with personalized guidance and industry insights.
+            Our experienced legal consultants help aspiring advocates, judges, and law professionals across India navigate their career paths with personalized guidance and industry insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-2">
             <Button
@@ -32,7 +32,7 @@ const ConsultantSection = () => {
         <div className="flex-1 order-1 lg:order-2 flex justify-center lg:justify-end animate-fade-in" style={{ animationDelay: "200ms" }}>
           <div className="relative w-full max-w-[400px] aspect-[4/5] rounded-2xl overflow-hidden shadow-elevated">
             <img
-              alt="Professional woman in a suit smiling"
+              alt="Legal career consultant"
               className="h-full w-full object-cover"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuB65PmXL1W8PbcxSGLxtabjfyimhxR2EmC41Gc_GMt4ZM76ViLeZGew095k6Xgdux4eAD16b2d8vnyyJXcjKQNZQjCLG09h9nobBL4tb5scebQBzACxMXgZXs0FgTQBAQynUBQ-sFE7vTqibbxWAYIrQUMGkgAhnDl4Tpsc61QXC3e215f-Dlozvf-6Uy8LK6HIfBS1OEkrl4LmeK24b5zYeHIrOVMnYFprCGNGYSgEV-GiAteg8dGPgg5s4fl28tYO6uY3YDZhWTM"
             />
