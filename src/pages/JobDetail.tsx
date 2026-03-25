@@ -177,29 +177,14 @@ const JobDetail = () => {
 
           {/* Main Content */}
           <div className="container py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
               {/* Left Column - Job Details */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-3 space-y-6">
                 {/* Description */}
                 {job.description && (
                   <div className="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-soft animate-fade-in">
                     <h2 className="text-xl font-display font-bold mb-4">About This Role</h2>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{job.description}</p>
-                  </div>
-                )}
-
-                {/* Custom Inputs */}
-                {job.customInputs && job.customInputs.length > 0 && (
-                  <div className="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-soft animate-fade-in">
-                    <h2 className="text-xl font-display font-bold mb-4">Additional Details</h2>
-                    <div className="space-y-4">
-                      {job.customInputs.map((input, index) => (
-                        <div key={index} className="flex flex-col gap-1">
-                          <p className="text-sm font-semibold text-foreground">{input.label}</p>
-                          <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{input.value}</p>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 )}
 
@@ -287,7 +272,7 @@ const JobDetail = () => {
               </div>
 
               {/* Right Column - Sidebar */}
-              <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+              <div className="lg:col-span-2 space-y-6 lg:sticky lg:top-24">
                 {/* Job Info Card */}
                 <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-soft animate-fade-in" style={{ animationDelay: "200ms" }}>
                   <h3 className="font-display font-bold mb-4">Job Details</h3>
@@ -324,6 +309,23 @@ const JobDetail = () => {
                       [...job.sidebarFields!].sort((a, b) => a.order - b.order).map((field) => (
                         <DynamicSidebarField key={field.id} field={field} job={job} />
                       ))
+                    )}
+
+                    {/* Additional Details (Custom Inputs) */}
+                    {job.customInputs && job.customInputs.length > 0 && (
+                      <>
+                        <div className="border-t border-border/50 pt-4 mt-2">
+                          <p className="text-xs text-muted-foreground uppercase font-medium mb-3">Additional Details</p>
+                          <div className="space-y-3">
+                            {job.customInputs.map((input, index) => (
+                              <div key={index} className="flex flex-col gap-0.5">
+                                <p className="text-xs font-semibold text-foreground">{input.label}</p>
+                                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{input.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
 

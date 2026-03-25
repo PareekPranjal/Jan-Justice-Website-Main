@@ -66,12 +66,12 @@ const JobsTable = () => {
         <div
           key={job._id}
           onClick={() => navigate(`/jobs/${job._id}`)}
-          className="group relative rounded-2xl bg-white border-2 border-primary/10 p-0 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_30px_-8px_rgba(194,102,42,0.2)] hover:-translate-y-1.5 overflow-hidden"
+          className="group relative rounded-2xl bg-white border-2 border-primary/10 p-0 cursor-pointer transition-all duration-300 hover:border-primary/40 hover:shadow-[0_8px_30px_-8px_rgba(194,102,42,0.2)] hover:-translate-y-1.5 overflow-hidden flex flex-col"
         >
           {/* Top accent bar */}
           <div className="h-1.5 w-full bg-gradient-to-r from-primary via-primary/70 to-primary/40" />
 
-          <div className="p-6">
+          <div className="p-6 flex flex-col flex-1">
             {/* Bookmark */}
             <button
               onClick={(e) => {
@@ -155,7 +155,7 @@ const JobsTable = () => {
             </div>
 
             {/* View button */}
-            <div className="pt-4 border-t border-primary/10">
+            <div className="pt-4 border-t border-primary/10 mt-auto">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary group-hover:underline">View Details</span>
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">

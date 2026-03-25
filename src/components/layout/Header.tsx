@@ -30,7 +30,7 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
-          <img src="/images/iconAndLogo.jpg" alt="Jan Justice Logo" className="h-10 object-contain transition-all duration-300 group-hover:scale-105" />
+          <img src="/images/JanJustice.png" alt="Jan Justice Logo" className="h-10 object-contain transition-all duration-300 group-hover:scale-105" />
         </Link>
 
         {variant === "default" && (

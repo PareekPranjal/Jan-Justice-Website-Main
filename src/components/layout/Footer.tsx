@@ -34,8 +34,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <img src="/images/iconAndLogo.jpg" alt="Jan Justice Logo" className="h-10 object-contain" />
-              <span className="font-display text-xl font-bold">Jan Justice</span>
+              <img src="/images/JanJustice.png" alt="Jan Justice Logo" className="h-10 object-contain" />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               India's trusted platform for legal job vacancies, law courses, and expert career guidance. Your journey in law starts here.
