@@ -12,9 +12,9 @@ interface HeaderProps {
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
-  { name: "Jobs", href: "/jobs", icon: Briefcase },
-  { name: "Courses", href: "/courses", icon: GraduationCap },
   { name: "Appointments", href: "/appointment", icon: Calendar },
+  { name: "Courses", href: "/courses", icon: GraduationCap },
+  { name: "Jobs", href: "/jobs", icon: Briefcase },
   { name: "Contact", href: "/contact", icon: MessageCircle },
 ];
 

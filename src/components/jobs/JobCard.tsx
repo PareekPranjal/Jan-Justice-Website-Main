@@ -44,7 +44,7 @@ const JobCard = ({ id, title, company, department, description, postDate }: JobC
           <p className="text-base font-semibold text-muted-foreground">{company}</p>
         </div>
       </div>
-      <div className="text-sm text-muted-foreground leading-relaxed pt-4 mt-1 border-t border-dashed border-border">
+      <div className="text-sm text-muted-foreground leading-relaxed pt-4 mt-1 border-t border-dashed border-border line-clamp-2">
         {description}
       </div>
       {postDate && (

@@ -8,16 +8,20 @@ const ConsultantSection = () => {
     <section className="w-full flex justify-center py-12 lg:py-20 px-4 lg:px-10 bg-card border-y border-border">
       <div className="flex flex-col lg:flex-row max-w-[960px] flex-1 gap-10 items-center">
         <div className="flex-1 order-2 lg:order-1 flex flex-col gap-6 animate-fade-in">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary w-fit">
-            <span className="material-symbols-outlined text-sm">verified</span> 
-            Expert Guidance
-          </div>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-            Expert{" "}
-            <span className="text-primary">Legal Career Guidance</span>
+            Built by Legal Professionals,{" "}
+            <span className="text-primary">Trusted by Community</span>
           </h2>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">200K+ legal audience</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">Real user engagement</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">Verified opportunities</span>
+          </div>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Our experienced legal consultants help aspiring advocates, judges, and law professionals across India navigate their career paths with personalized guidance and industry insights.
+            JanJustice is built on real needs — not assumptions.
+          </p>
+          <p className="text-xl font-semibold">
+            Legal Help. Legal Skills. Legal Opportunities.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-2">
             <Button

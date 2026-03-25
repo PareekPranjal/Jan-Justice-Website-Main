@@ -17,6 +17,7 @@ const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const MyCourses = lazy(() => import("./pages/MyCourses"));
 const Appointment = lazy(() => import("./pages/Appointment"));
+const AppointmentDevPage = lazy(() => import("./pages/AppointmentDevPage"));
 const Login = lazy(() => import("./pages/Login"));
 const Profile = lazy(() => import("./pages/Profile"));
 const SavedJobs = lazy(() => import("./pages/SavedJobs"));
@@ -52,6 +53,7 @@ const App = () => (
                   <Route path="/course-detail" element={<CourseDetail />} />
                   <Route path="/my-courses" element={<MyCourses />} />
                   <Route path="/appointment" element={<Appointment />} />
+                  <Route path="/appointment-dev" element={<AppointmentDevPage />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/saved-jobs" element={<SavedJobs />} />

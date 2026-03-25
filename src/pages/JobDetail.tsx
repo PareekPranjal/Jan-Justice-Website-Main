@@ -189,11 +189,11 @@ const JobDetail = () => {
                 {job.customInputs && job.customInputs.length > 0 && (
                   <div className="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-soft animate-fade-in">
                     <h2 className="text-xl font-display font-bold mb-4">Additional Details</h2>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {job.customInputs.map((input, index) => (
-                        <div key={index} className="flex items-start gap-4 py-2 border-b border-border/30 last:border-0">
-                          <span className="text-sm font-semibold text-foreground min-w-[140px]">{input.label}</span>
-                          <span className="text-sm text-muted-foreground">{input.value}</span>
+                        <div key={index} className="flex flex-col gap-1">
+                          <p className="text-sm font-semibold text-foreground">{input.label}</p>
+                          <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{input.value}</p>
                         </div>
                       ))}
                     </div>

@@ -76,7 +76,7 @@ const Login = () => {
                 Welcome back to your legal career journey
               </h1>
               <p className="text-primary-foreground/80 text-lg leading-relaxed">
-                Access thousands of legal jobs, expert-led courses, and personalized career consultations.
+                Access thousands of legal jobs across India, expert-led law courses, and personalized career consultations.
               </p>
             </div>
 
@@ -92,7 +92,7 @@ const Login = () => {
                 ))}
               </div>
               <p className="text-sm text-primary-foreground/80">
-                Join 50,000+ legal professionals
+                Join 50,000+ legal professionals across India
               </p>
             </div>
           </div>
