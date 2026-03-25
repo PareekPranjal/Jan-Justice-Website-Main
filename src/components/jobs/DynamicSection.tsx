@@ -1,5 +1,7 @@
 import type { TabSection, Job } from '../../lib/api';
 import { BACKEND_URL } from '../../lib/api';
+
+const resolveFileUrl = (url: string) => url.startsWith('http') ? url : `${BACKEND_URL}${url}`;
 import { CheckCircle, FileText, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { useState } from 'react';
@@ -135,7 +137,7 @@ function FixedFieldSection({ section, job }: { section: TabSection; job: Job }) 
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => window.open(`${BACKEND_URL}${job.jobDescriptionPdf!.url}`, '_blank')}
+                  onClick={() => window.open(resolveFileUrl(job.jobDescriptionPdf!.url), '_blank')}
                   className="flex items-center gap-1 px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90"
                 >
                   <Download className="h-4 w-4" /> Download
@@ -151,7 +153,7 @@ function FixedFieldSection({ section, job }: { section: TabSection; job: Job }) 
             </div>
             <div className={`rounded-xl overflow-hidden border transition-all duration-500 ${isPdfExpanded ? 'h-[800px]' : 'h-[500px]'}`}>
               <iframe
-                src={`${BACKEND_URL}${job.jobDescriptionPdf.url}`}
+                src={resolveFileUrl(job.jobDescriptionPdf.url)}
                 className="w-full h-full"
                 title="Job Description PDF"
               />
@@ -164,7 +166,7 @@ function FixedFieldSection({ section, job }: { section: TabSection; job: Job }) 
       case 'companyImage':
         return job.companyImage?.url ? (
           <img
-            src={`${BACKEND_URL}${job.companyImage.url}`}
+            src={resolveFileUrl(job.companyImage.url)}
             alt={job.company}
             className="w-full max-h-64 object-contain rounded-xl border"
           />

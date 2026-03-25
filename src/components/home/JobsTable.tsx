@@ -72,7 +72,7 @@ const JobsTable = () => {
           <div className="flex items-start gap-3 mb-4">
             {job.companyImage?.url ? (
               <img
-                src={`${BACKEND_URL}${job.companyImage.url}`}
+                src={job.companyImage.url.startsWith('http') ? job.companyImage.url : `${BACKEND_URL}${job.companyImage.url}`}
                 alt={job.company}
                 className="h-12 w-12 rounded-xl object-cover border border-border/50"
               />

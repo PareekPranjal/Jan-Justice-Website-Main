@@ -26,6 +26,9 @@ const JobDetail = () => {
     enabled: !!id,
   });
 
+  // Resolve file URL: full URLs (Cloudinary) are used as-is, relative paths get BACKEND_URL prepended
+  const resolveFileUrl = (url: string) => url.startsWith('http') ? url : `${BACKEND_URL}${url}`;
+
   const hasDynamicTabs = Boolean(job?.tabs && job.tabs.length > 0);
   const hasDynamicSidebar = Boolean(job?.sidebarFields && job.sidebarFields.length > 0);
 
@@ -110,7 +113,7 @@ const JobDetail = () => {
                   <div className="flex items-center gap-3 mb-4">
                     {job.companyImage?.url ? (
                       <img
-                        src={`${BACKEND_URL}${job.companyImage.url}`}
+                        src={resolveFileUrl(job.companyImage.url)}
                         alt={job.company || job.title}
                         className="h-14 w-14 rounded-xl object-cover shadow-glow"
                       />
@@ -244,7 +247,7 @@ const JobDetail = () => {
                           variant="outline"
                           size="sm"
                           className="gap-2"
-                          onClick={() => window.open(`${BACKEND_URL}${job.jobDescriptionPdf?.url}`, '_blank')}
+                          onClick={() => window.open(resolveFileUrl(job.jobDescriptionPdf?.url || ''), '_blank')}
                         >
                           <Download className="h-4 w-4" />
                           Download
@@ -262,7 +265,7 @@ const JobDetail = () => {
                     </div>
                     <div className={`transition-all duration-500 ${isPdfExpanded ? "h-[800px]" : "h-[500px]"}`}>
                       <iframe
-                        src={`${BACKEND_URL}${job.jobDescriptionPdf.url}`}
+                        src={resolveFileUrl(job.jobDescriptionPdf.url)}
                         className="w-full h-full border-0"
                         title="Job Description PDF"
                       />
@@ -271,7 +274,7 @@ const JobDetail = () => {
                       <p className="text-sm text-muted-foreground text-center">
                         Can't view the PDF?{" "}
                         <a
-                          href={`${BACKEND_URL}${job.jobDescriptionPdf.url}`}
+                          href={resolveFileUrl(job.jobDescriptionPdf.url)}
                           download
                           className="text-primary font-medium hover:underline"
                         >
