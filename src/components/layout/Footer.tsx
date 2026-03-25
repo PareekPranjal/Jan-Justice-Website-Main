@@ -5,7 +5,7 @@ const footerLinks = {
   platform: [
     { name: "Jobs", href: "/jobs", icon: Briefcase },
     { name: "Courses", href: "/courses", icon: GraduationCap },
-    { name: "Appointments", href: "/appointment", icon: Calendar },
+    { name: "Consultancy", href: "/appointment", icon: Calendar },
   ],
   company: [
     { name: "About Us", href: "/about" },

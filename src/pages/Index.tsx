@@ -8,17 +8,11 @@ import JobsTable from "@/components/home/JobsTable";
 import CourseCard from "@/components/home/CourseCard";
 import ConsultantSection from "@/components/home/ConsultantSection";
 import YouTubeSection from "@/components/home/YouTubeSection";
-import { ArrowRight, Star, Users, Award, TrendingUp } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { courseApi, statsApi } from "@/lib/api";
+import { courseApi } from "@/lib/api";
 
 const Index = () => {
-  // Fetch homepage stats
-  const { data: apiStats } = useQuery({
-    queryKey: ['homepageStats'],
-    queryFn: () => statsApi.getStats(),
-  });
-
   // Fetch courses for homepage
   const { data: allCourses = [] } = useQuery({
     queryKey: ['homePageCourses'],
@@ -49,19 +43,6 @@ const Index = () => {
     },
   ];
 
-  // Use real stats or fallback to defaults
-  const stats = apiStats ? [
-    { icon: Users, value: apiStats.students.display, label: "Legal Professionals" },
-    { icon: Award, value: apiStats.courses.display + '+', label: "Certified Courses" },
-    { icon: Star, value: apiStats.rating.display, label: "Average Rating" },
-    { icon: TrendingUp, value: apiStats.successRate.display, label: "Success Rate" },
-  ] : [
-    { icon: Users, value: "50K+", label: "Legal Professionals" },
-    { icon: Award, value: "200+", label: "Certified Courses" },
-    { icon: Star, value: "4.9", label: "Average Rating" },
-    { icon: TrendingUp, value: "95%", label: "Success Rate" },
-  ];
-
   return (
     <>
       <Helmet>
@@ -83,49 +64,23 @@ const Index = () => {
 
             <div className="container py-16 lg:py-24">
               <div className="flex flex-col gap-8 text-center items-center max-w-4xl mx-auto">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight tracking-tight animate-fade-in" style={{ animationDelay: "100ms" }}>
-                  JanJustice – Your Legal Support &{" "}
-                  <span className="gradient-text">Career Platform</span>
+                <h1 className="animate-fade-in flex flex-col items-center gap-3" style={{ animationDelay: "100ms" }}>
+                  <span className="text-6xl md:text-7xl lg:text-8xl font-display font-extrabold tracking-tight text-primary">
+                    Jan<span className="text-foreground">Justice</span>
+                  </span>
+                  <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-muted-foreground tracking-wide whitespace-nowrap">
+                    Your Legal Support & Career Platform
+                  </span>
                 </h1>
                 
                 <p className="text-muted-foreground text-lg md:text-xl font-normal leading-relaxed max-w-2xl animate-fade-in" style={{ animationDelay: "200ms" }}>
                   Get trusted legal guidance, learn practical law skills, and explore verified legal job opportunities — all in one place.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "300ms" }}>
-                  <Link to="/jobs">
-                    <Button size="lg" className="h-12 px-8 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
-                      Explore Jobs
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Link to="/courses">
-                    <Button size="lg" variant="outline" className="h-12 px-8">
-                      Browse Courses
-                    </Button>
-                  </Link>
-                </div>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: "400ms" }}>
-                {stats.map((stat) => (
-                  <div key={stat.label} className="flex flex-col items-center gap-2 p-6 rounded-2xl bg-card border border-border/50 shadow-soft hover:shadow-elevated transition-all duration-300">
-                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-2">
-                      <stat.icon className="h-6 w-6" />
-                    </div>
-                    <span className="text-2xl md:text-3xl font-display font-bold">{stat.value}</span>
-                    <span className="text-sm text-muted-foreground text-center">{stat.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section className="w-full py-16 bg-muted/30">
-            <div className="container">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {/* Feature Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-5xl mx-auto">
                 {features.map((feature, index) => (
                   <FeatureCard key={feature.href} {...feature} delay={index * 100} />
                 ))}

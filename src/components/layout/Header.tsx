@@ -12,7 +12,7 @@ interface HeaderProps {
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
-  { name: "Appointments", href: "/appointment", icon: Calendar },
+  { name: "Consultancy", href: "/appointment", icon: Calendar },
   { name: "Courses", href: "/courses", icon: GraduationCap },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
   { name: "Contact", href: "/contact", icon: MessageCircle },
@@ -58,15 +58,16 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
 
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center gap-3">
-              <Link to="/saved-jobs" className="relative">
+              <Link to="/saved-jobs" className="relative group">
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`h-9 w-9 ${isActive('/saved-jobs') ? 'bg-primary/10 text-primary' : ''}`}
+                  variant="outline"
+                  size="sm"
+                  className={`gap-2 ${isActive('/saved-jobs') ? 'bg-primary/10 text-primary border-primary/30' : ''}`}
                 >
                   <Bookmark className={`h-4 w-4 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
+                  Saved Jobs
                   {savedCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                    <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-[11px] font-bold text-primary-foreground flex items-center justify-center">
                       {savedCount > 9 ? '9+' : savedCount}
                     </span>
                   )}
