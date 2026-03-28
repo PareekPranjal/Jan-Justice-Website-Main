@@ -68,7 +68,7 @@ const Index = () => {
                   <span className="text-6xl md:text-7xl lg:text-8xl font-display font-extrabold tracking-tight text-primary">
                     Jan<span className="text-foreground">Justice</span>
                   </span>
-                  <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-muted-foreground tracking-wide whitespace-nowrap">
+                  <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-muted-foreground tracking-wide text-center">
                     Your Legal Support & Career Platform
                   </span>
                 </h1>
