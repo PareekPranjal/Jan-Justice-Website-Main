@@ -132,6 +132,11 @@ const JobDetail = () => {
                     <span className="badge-warning">{job.department}</span>
                     {job.employmentType && <span className="badge-info">{job.employmentType}</span>}
                     {job.workMode && <span className="badge-success">{job.workMode}</span>}
+                    {job.tags?.map((tag, i) => (
+                      <span key={i} className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-violet-50 text-violet-600 border border-violet-200/60">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
 

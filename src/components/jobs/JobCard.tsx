@@ -10,9 +10,10 @@ interface JobCardProps {
   department: string;
   description: string;
   postDate?: string;
+  tags?: string[];
 }
 
-const JobCard = ({ id, title, company, department, description, postDate }: JobCardProps) => {
+const JobCard = ({ id, title, company, department, description, postDate, tags }: JobCardProps) => {
   const navigate = useNavigate();
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const saved = isJobSaved(id);
@@ -39,6 +40,11 @@ const JobCard = ({ id, title, company, department, description, postDate }: JobC
         <div className="flex-1">
           <div className="flex flex-wrap gap-2 mb-2">
             <span className="badge-info">{department}</span>
+            {tags?.map((tag, i) => (
+              <span key={i} className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-violet-50 text-violet-600 border border-violet-200/60">
+                {tag}
+              </span>
+            ))}
           </div>
           <h3 className="text-xl font-bold mb-1">{title}</h3>
           <p className="text-base font-semibold text-muted-foreground">{company}</p>

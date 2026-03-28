@@ -160,6 +160,7 @@ const Jobs = () => {
                     department={job.department}
                     description={job.description}
                     postDate={job.postDate || job.createdAt}
+                    tags={job.tags}
                   />
                 </div>
               ))}

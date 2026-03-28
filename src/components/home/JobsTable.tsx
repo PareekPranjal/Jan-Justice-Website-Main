@@ -152,6 +152,11 @@ const JobsTable = () => {
                   {job.department}
                 </span>
               )}
+              {job.tags?.map((tag, i) => (
+                <span key={i} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-violet-50 text-violet-600 border border-violet-200/60">
+                  {tag}
+                </span>
+              ))}
             </div>
 
             {/* View button */}
