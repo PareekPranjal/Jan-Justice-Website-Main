@@ -153,7 +153,7 @@ function FixedFieldSection({ section, job }: { section: TabSection; job: Job }) 
             </div>
             <div className={`rounded-xl overflow-hidden border transition-all duration-500 ${isPdfExpanded ? 'h-[800px]' : 'h-[500px]'}`}>
               <iframe
-                src={resolveFileUrl(job.jobDescriptionPdf.url)}
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(resolveFileUrl(job.jobDescriptionPdf.url))}&embedded=true`}
                 className="w-full h-full"
                 title="Job Description PDF"
               />

@@ -1,4 +1,4 @@
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+// const API_BASE_URL = 'http://localhost:5001/api';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://jan-justice-bancked.onrender.com/api';
 export const BACKEND_URL = API_BASE_URL.replace(/\/api$/, '');
 

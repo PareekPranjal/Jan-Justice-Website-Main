@@ -255,7 +255,7 @@ const JobDetail = () => {
                     </div>
                     <div className={`transition-all duration-500 ${isPdfExpanded ? "h-[800px]" : "h-[500px]"}`}>
                       <iframe
-                        src={resolveFileUrl(job.jobDescriptionPdf.url)}
+                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(resolveFileUrl(job.jobDescriptionPdf.url))}&embedded=true`}
                         className="w-full h-full border-0"
                         title="Job Description PDF"
                       />
