@@ -38,7 +38,7 @@ const ConsultantSection = () => {
             <img
               alt="Legal career consultant"
               className="h-full w-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuB65PmXL1W8PbcxSGLxtabjfyimhxR2EmC41Gc_GMt4ZM76ViLeZGew095k6Xgdux4eAD16b2d8vnyyJXcjKQNZQjCLG09h9nobBL4tb5scebQBzACxMXgZXs0FgTQBAQynUBQ-sFE7vTqibbxWAYIrQUMGkgAhnDl4Tpsc61QXC3e215f-Dlozvf-6Uy8LK6HIfBS1OEkrl4LmeK24b5zYeHIrOVMnYFprCGNGYSgEV-GiAteg8dGPgg5s4fl28tYO6uY3YDZhWTM"
+              src="/images/177476879372.jpeg"
             />
           </div>
         </div>

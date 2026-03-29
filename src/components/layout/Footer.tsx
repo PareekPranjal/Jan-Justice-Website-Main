@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Briefcase, GraduationCap, Calendar, Mail, Phone, MapPin, Github, Linkedin, Twitter } from "lucide-react";
+import { Briefcase, GraduationCap, Calendar, Mail, Phone, MapPin, Youtube } from "lucide-react";
 
 const footerLinks = {
   platform: [
@@ -7,30 +7,22 @@ const footerLinks = {
     { name: "Courses", href: "/courses", icon: GraduationCap },
     { name: "Consultancy", href: "/appointment", icon: Calendar },
   ],
-  company: [
-    { name: "About Us", href: "/about" },
-    { name: "Careers", href: "/careers" },
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-  ],
   contact: [
-    { icon: Mail, text: "contact@janjustice.in" },
-    { icon: Phone, text: "+91 98765 43210" },
+    { icon: Mail, text: "connect@janjustice.com" },
+    { icon: Phone, text: "+91 70230 76680" },
     { icon: MapPin, text: "Jaipur, Rajasthan, India" },
   ],
 };
 
 const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Github, href: "#", label: "GitHub" },
+  { icon: Youtube, href: "https://www.youtube.com/@half-civil-judge", label: "YouTube" },
 ];
 
 const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-card/50 backdrop-blur-sm">
       <div className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
@@ -64,23 +56,6 @@ const Footer = () => {
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     <link.icon className="h-4 w-4" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Company</h4>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
                     {link.name}
                   </Link>
                 </li>

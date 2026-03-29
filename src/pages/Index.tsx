@@ -115,7 +115,7 @@ const Index = () => {
           <YouTubeSection />
 
           {/* Popular Courses Section */}
-          <section className="w-full py-16 lg:py-20 bg-muted/30">
+          {/* <section className="w-full py-16 lg:py-20 bg-muted/30">
             <div className="container">
               <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
@@ -149,7 +149,7 @@ const Index = () => {
                 </Link>
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* Consultant Section */}
           <ConsultantSection />

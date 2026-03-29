@@ -5,9 +5,9 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, MessageCircle, Send, MapPin, Clock, ArrowRight } from "lucide-react";
 
-const CONTACT_EMAIL = "contact@janjustice.in";
-const CONTACT_PHONE = "+919876543210";
-const WHATSAPP_NUMBER = "919876543210";
+const CONTACT_EMAIL = "connect@janjustice.com";
+const CONTACT_PHONE = "+917023076680";
+const WHATSAPP_NUMBER = "917023076680";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
