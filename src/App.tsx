@@ -14,6 +14,7 @@ const Index = lazy(() => import("./pages/Index"));
 const Jobs = lazy(() => import("./pages/Jobs"));
 const JobDetail = lazy(() => import("./pages/JobDetail"));
 const Courses = lazy(() => import("./pages/Courses"));
+const CoursesComingSoon = lazy(() => import("./pages/CoursesComingSoon"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const MyCourses = lazy(() => import("./pages/MyCourses"));
 const Appointment = lazy(() => import("./pages/Appointment"));
@@ -48,8 +49,9 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/jobs" element={<Jobs />} />
                   <Route path="/jobs/:id" element={<JobDetail />} />
-                  <Route path="/courses" element={<Courses />} />
-                  <Route path="/courses/:id" element={<CourseDetail />} />
+                  <Route path="/courses" element={<CoursesComingSoon />} />
+                  <Route path="/courses-dev" element={<Courses />} />
+                  <Route path="/courses-dev/:id" element={<CourseDetail />} />
                   <Route path="/course-detail" element={<CourseDetail />} />
                   <Route path="/my-courses" element={<MyCourses />} />
                   <Route path="/appointment" element={<Appointment />} />
