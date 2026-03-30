@@ -64,7 +64,7 @@ const Profile = () => {
   });
 
   // Fetch user profile
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const { data: profileData, isLoading: isLoadingUser } = useQuery({
     queryKey: ['userProfile', userEmail],
     queryFn: () => userApi.getUserProfile(userEmail),
     enabled: !!userEmail,
@@ -75,7 +75,7 @@ const Profile = () => {
   const { data: userStats, isLoading: isLoadingStats } = useQuery({
     queryKey: ['userStats', userEmail],
     queryFn: () => userApi.getUserStats(userEmail),
-    enabled: !!user,
+    enabled: !!profileData,
     retry: false,
   });
 
@@ -83,21 +83,21 @@ const Profile = () => {
   const { data: savedJobs = [], isLoading: isLoadingSavedJobs } = useQuery({
     queryKey: ['savedJobs', userEmail],
     queryFn: () => userApi.getSavedJobs(userEmail),
-    enabled: !!user,
+    enabled: !!profileData,
   });
 
   // Fetch enrolled courses
   const { data: enrolledCourses = [], isLoading: isLoadingCourses } = useQuery({
     queryKey: ['enrolledCourses', userEmail],
     queryFn: () => userApi.getCourseEnrollments(userEmail),
-    enabled: !!user,
+    enabled: !!profileData,
   });
 
   // Fetch upcoming appointments
   const { data: allAppointments = [], isLoading: isLoadingAppointments } = useQuery({
     queryKey: ['userAppointments', userEmail],
     queryFn: () => appointmentApi.getAppointments({ email: userEmail }),
-    enabled: !!user,
+    enabled: !!profileData,
   });
 
   // Filter for upcoming appointments only
@@ -148,14 +148,14 @@ const Profile = () => {
 
   // Initialize form data when user data is loaded (fall back to auth user)
   useEffect(() => {
-    if (user) {
+    if (profileData) {
       setFormData({
-        firstName: user.firstName || authUser?.firstName || "",
-        lastName: user.lastName || authUser?.lastName || "",
-        phone: user.phone || "",
-        location: user.location || "",
-        title: user.title || "",
-        company: user.company || "",
+        firstName: profileData.firstName || authUser?.firstName || "",
+        lastName: profileData.lastName || authUser?.lastName || "",
+        phone: profileData.phone || "",
+        location: profileData.location || "",
+        title: profileData.title || "",
+        company: profileData.company || "",
       });
     } else if (authUser) {
       setFormData(prev => ({
@@ -164,7 +164,7 @@ const Profile = () => {
         lastName: authUser.lastName || "",
       }));
     }
-  }, [user, authUser]);
+  }, [profileData, authUser]);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,14 +201,14 @@ const Profile = () => {
   const toggleEditMode = () => {
     if (isEditing) {
       // If canceling edit, reset form data
-      if (user) {
+      if (profileData) {
         setFormData({
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          phone: user.phone || "",
-          location: user.location || "",
-          title: user.title || "",
-          company: user.company || "",
+          firstName: profileData.firstName || "",
+          lastName: profileData.lastName || "",
+          phone: profileData.phone || "",
+          location: profileData.location || "",
+          title: profileData.title || "",
+          company: profileData.company || "",
         });
       }
     }
@@ -245,7 +245,7 @@ const Profile = () => {
   }
 
   // If no full profile yet, build a minimal display from auth data
-  const displayUser = user ?? (authUser ? {
+  const displayUser = profileData ?? (authUser ? {
     _id: authUser._id,
     firstName: authUser.firstName,
     lastName: authUser.lastName,
@@ -308,8 +308,6 @@ const Profile = () => {
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
     return `${Math.floor(diffDays / 30)} months ago`;
   };
-
-  const user = displayUser;
 
   return (
     <>
