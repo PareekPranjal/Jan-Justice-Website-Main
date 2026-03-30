@@ -67,21 +67,23 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
 
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center gap-3">
-              <Link to="/saved-jobs" className="relative group">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`gap-2 ${isActive('/saved-jobs') ? 'bg-primary/10 text-primary border-primary/30' : ''}`}
-                >
-                  <Bookmark className={`h-4 w-4 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
-                  Saved Jobs
-                  {user && savedCount > 0 && (
-                    <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-[11px] font-bold text-primary-foreground flex items-center justify-center">
-                      {savedCount > 9 ? '9+' : savedCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
+              {user && (
+                <Link to="/saved-jobs" className="relative group">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`gap-2 ${isActive('/saved-jobs') ? 'bg-primary/10 text-primary border-primary/30' : ''}`}
+                  >
+                    <Bookmark className={`h-4 w-4 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
+                    Saved Jobs
+                    {savedCount > 0 && (
+                      <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-[11px] font-bold text-primary-foreground flex items-center justify-center">
+                        {savedCount > 9 ? '9+' : savedCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              )}
               {user ? (
                 <>
                   <Link to="/profile">
@@ -133,23 +135,25 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
                         </Link>
                       );
                     })}
-                    <Link
-                      to="/saved-jobs"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
-                        isActive('/saved-jobs')
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      }`}
-                    >
-                      <Bookmark className={`h-5 w-5 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
-                      Saved Jobs
-                      {user && savedCount > 0 && (
-                        <span className="ml-auto h-5 min-w-5 px-1.5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                          {savedCount}
-                        </span>
-                      )}
-                    </Link>
+                    {user && (
+                      <Link
+                        to="/saved-jobs"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                          isActive('/saved-jobs')
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <Bookmark className={`h-5 w-5 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
+                        Saved Jobs
+                        {savedCount > 0 && (
+                          <span className="ml-auto h-5 min-w-5 px-1.5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                            {savedCount}
+                          </span>
+                        )}
+                      </Link>
+                    )}
                   </nav>
 
                   <div className="border-t pt-6 flex flex-col gap-3">
