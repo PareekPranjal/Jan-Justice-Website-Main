@@ -22,22 +22,26 @@ const JobDetail = () => {
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const { toast } = useToast();
 
-  // Build Cloudinary download URL with fl_attachment:filename so browser saves as .pdf
-  const getDownloadUrl = (url: string, filename: string) => {
-    const name = (filename.endsWith('.pdf') ? filename : `${filename}.pdf`).replace(/\s+/g, '_');
-    if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-      return url.replace('/upload/', `/upload/fl_attachment:${name}/`);
+  const downloadPdf = async (url: string, filename: string) => {
+    const name = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch {
+      // CORS fallback: open with fl_attachment so browser prompts save
+      const fallback = url.includes('res.cloudinary.com') && url.includes('/upload/')
+        ? url.replace('/upload/', `/upload/fl_attachment:${name.replace(/\s+/g, '_')}/`)
+        : url;
+      window.open(fallback, '_blank');
     }
-    return url;
-  };
-
-  const downloadPdf = (url: string, filename: string) => {
-    const a = document.createElement('a');
-    a.href = getDownloadUrl(url, filename);
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
   };
 
   // Google Docs Viewer URL — only way to preview Cloudinary raw PDFs without auto-download
