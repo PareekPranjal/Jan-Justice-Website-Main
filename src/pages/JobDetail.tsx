@@ -18,26 +18,26 @@ const JobDetail = () => {
   const navigate = useNavigate();
   const [isPdfExpanded, setIsPdfExpanded] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(true);
+  const [pdfError, setPdfError] = useState(false);
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const { toast } = useToast();
 
-  const downloadPdf = async (url: string, filename: string) => {
-    const name = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
-    try {
-      const res = await fetch(url);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    } catch {
-      // fallback: open in new tab
-      window.open(url, '_blank');
+  // Add fl_attachment to Cloudinary URL to force browser download
+  const getDownloadUrl = (url: string) => {
+    if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+      return url.replace('/upload/', '/upload/fl_attachment/');
     }
+    return url;
+  };
+
+  const downloadPdf = (url: string, filename: string) => {
+    const name = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    const a = document.createElement('a');
+    a.href = getDownloadUrl(url);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const { data: job, isLoading, error } = useQuery({
@@ -277,19 +277,37 @@ const JobDetail = () => {
                       </div>
                     </div>
                     <div className={`relative transition-all duration-500 ${isPdfExpanded ? "h-[800px]" : "h-[500px]"}`}>
-                      {isPdfLoading && (
+                      {isPdfLoading && !pdfError && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/40 z-10">
                           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-3" />
                           <p className="text-sm text-muted-foreground">Loading PDF...</p>
                         </div>
                       )}
-                      <iframe
-                        key={job.jobDescriptionPdf.url}
-                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(resolveFileUrl(job.jobDescriptionPdf.url))}&embedded=true`}
-                        className="w-full h-full border-0"
-                        title="Job Description PDF"
-                        onLoad={() => setIsPdfLoading(false)}
-                      />
+                      {pdfError ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/20">
+                          <FileText className="h-12 w-12 text-muted-foreground mb-3" />
+                          <p className="text-sm text-muted-foreground mb-3">Unable to preview PDF in browser</p>
+                          <Button
+                            size="sm"
+                            onClick={() => downloadPdf(
+                              resolveFileUrl(job.jobDescriptionPdf?.url || ''),
+                              job.jobDescriptionPdf?.filename || 'Job_Description.pdf'
+                            )}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download PDF
+                          </Button>
+                        </div>
+                      ) : (
+                        <iframe
+                          key={job.jobDescriptionPdf.url}
+                          src={resolveFileUrl(job.jobDescriptionPdf.url)}
+                          className="w-full h-full border-0"
+                          title="Job Description PDF"
+                          onLoad={() => setIsPdfLoading(false)}
+                          onError={() => { setIsPdfLoading(false); setPdfError(true); }}
+                        />
+                      )}
                     </div>
                     <div className="p-4 bg-muted/30 border-t border-border/50">
                       <p className="text-sm text-muted-foreground text-center">
