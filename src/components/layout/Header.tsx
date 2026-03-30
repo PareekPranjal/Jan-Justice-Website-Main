@@ -26,13 +26,13 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
   const { savedCount } = useSavedJobs();
   const { user, logout } = useAuth();
 
+  const isActive = (path: string) => location.pathname === path;
+
   const handleLogout = () => {
     logout();
     navigate('/');
     setMobileMenuOpen(false);
   };
-
-  const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -144,7 +144,7 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
                     >
                       <Bookmark className={`h-5 w-5 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
                       Saved Jobs
-                      {savedCount > 0 && (
+                      {user && savedCount > 0 && (
                         <span className="ml-auto h-5 min-w-5 px-1.5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
                           {savedCount}
                         </span>

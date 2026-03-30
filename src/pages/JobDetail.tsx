@@ -17,8 +17,28 @@ const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isPdfExpanded, setIsPdfExpanded] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(true);
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const { toast } = useToast();
+
+  const downloadPdf = async (url: string, filename: string) => {
+    const name = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      // fallback: open in new tab
+      window.open(url, '_blank');
+    }
+  };
 
   const { data: job, isLoading, error } = useQuery({
     queryKey: ['job', id],
@@ -237,7 +257,10 @@ const JobDetail = () => {
                           variant="outline"
                           size="sm"
                           className="gap-2"
-                          onClick={() => window.open(resolveFileUrl(job.jobDescriptionPdf?.url || ''), '_blank')}
+                          onClick={() => downloadPdf(
+                            resolveFileUrl(job.jobDescriptionPdf?.url || ''),
+                            job.jobDescriptionPdf?.filename || 'Job_Description.pdf'
+                          )}
                         >
                           <Download className="h-4 w-4" />
                           Download
@@ -253,23 +276,33 @@ const JobDetail = () => {
                         </Button>
                       </div>
                     </div>
-                    <div className={`transition-all duration-500 ${isPdfExpanded ? "h-[800px]" : "h-[500px]"}`}>
+                    <div className={`relative transition-all duration-500 ${isPdfExpanded ? "h-[800px]" : "h-[500px]"}`}>
+                      {isPdfLoading && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/40 z-10">
+                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-3" />
+                          <p className="text-sm text-muted-foreground">Loading PDF...</p>
+                        </div>
+                      )}
                       <iframe
+                        key={job.jobDescriptionPdf.url}
                         src={`https://docs.google.com/viewer?url=${encodeURIComponent(resolveFileUrl(job.jobDescriptionPdf.url))}&embedded=true`}
                         className="w-full h-full border-0"
                         title="Job Description PDF"
+                        onLoad={() => setIsPdfLoading(false)}
                       />
                     </div>
                     <div className="p-4 bg-muted/30 border-t border-border/50">
                       <p className="text-sm text-muted-foreground text-center">
                         Can't view the PDF?{" "}
-                        <a
-                          href={resolveFileUrl(job.jobDescriptionPdf.url)}
-                          download
+                        <button
+                          onClick={() => downloadPdf(
+                            resolveFileUrl(job.jobDescriptionPdf?.url || ''),
+                            job.jobDescriptionPdf?.filename || 'Job_Description.pdf'
+                          )}
                           className="text-primary font-medium hover:underline"
                         >
                           Click here to download
-                        </a>
+                        </button>
                       </p>
                     </div>
                   </div>
