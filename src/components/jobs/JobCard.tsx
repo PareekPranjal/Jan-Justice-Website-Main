@@ -1,7 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Calendar } from "lucide-react";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface JobCardProps {
   id: string;
@@ -15,17 +17,37 @@ interface JobCardProps {
 
 const JobCard = ({ id, title, company, department, description, postDate, tags }: JobCardProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const saved = isJobSaved(id);
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please login to save jobs.",
+        action: (
+          <button
+            onClick={() => navigate('/login', { state: { from: location.pathname } })}
+            className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground"
+          >
+            Login
+          </button>
+        ),
+      });
+      return;
+    }
+    toggleSaveJob(id);
+  };
 
   return (
     <article className="group relative bg-card border border-border rounded-xl p-5 lg:p-6 hover:shadow-card-hover transition-all duration-300 flex flex-col gap-4">
       {/* Bookmark button */}
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleSaveJob(id);
-        }}
+        onClick={handleSave}
         className={`absolute top-4 right-4 h-9 w-9 rounded-lg flex items-center justify-center transition-all duration-200 ${
           saved
             ? 'bg-primary/10 text-primary'

@@ -3,13 +3,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import { PageLoader } from "@/components/ui/loader";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 
-// Lazy load pages for better performance
+// Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
 const Jobs = lazy(() => import("./pages/Jobs"));
 const JobDetail = lazy(() => import("./pages/JobDetail"));
@@ -36,36 +37,56 @@ const queryClient = new QueryClient({
   },
 });
 
+// Redirect to login if not authenticated
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  const location = useLocation();
+  if (isLoading) return <PageLoader />;
+  if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  return <>{children}</>;
+}
+
+function AppRoutes() {
+  const { user, isLoading } = useAuth();
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/jobs/:id" element={<JobDetail />} />
+        <Route path="/courses" element={<CoursesComingSoon />} />
+        <Route path="/courses-dev" element={<Courses />} />
+        <Route path="/courses-dev/:id" element={<CourseDetail />} />
+        <Route path="/course-detail" element={<CourseDetail />} />
+        <Route path="/appointment" element={<Appointment />} />
+        <Route path="/appointment-dev" element={<AppointmentDevPage />} />
+        <Route path="/contact" element={<Contact />} />
+        {/* Auth */}
+        <Route path="/login" element={!isLoading && user ? <Navigate to="/" replace /> : <Login />} />
+        {/* Protected */}
+        <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+        <Route path="/saved-jobs" element={<RequireAuth><SavedJobs /></RequireAuth>} />
+        <Route path="/my-courses" element={<RequireAuth><MyCourses /></RequireAuth>} />
+        {/* Catch-all */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  );
+}
+
 const App = () => (
   <Provider store={store}>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/jobs" element={<Jobs />} />
-                  <Route path="/jobs/:id" element={<JobDetail />} />
-                  <Route path="/courses" element={<CoursesComingSoon />} />
-                  <Route path="/courses-dev" element={<Courses />} />
-                  <Route path="/courses-dev/:id" element={<CourseDetail />} />
-                  <Route path="/course-detail" element={<CourseDetail />} />
-                  <Route path="/my-courses" element={<MyCourses />} />
-                  <Route path="/appointment" element={<Appointment />} />
-                  <Route path="/appointment-dev" element={<AppointmentDevPage />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/saved-jobs" element={<SavedJobs />} />
-                  <Route path="/contact" element={<Contact />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </TooltipProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>
   </Provider>

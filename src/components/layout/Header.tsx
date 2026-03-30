@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Briefcase, GraduationCap, Calendar, MessageCircle, LogIn, User, Bookmark } from "lucide-react";
+import { Menu, Home, Briefcase, GraduationCap, Calendar, MessageCircle, LogIn, User, Bookmark, LogOut } from "lucide-react";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
+import { useAuth } from "@/context/AuthContext";
 
 interface HeaderProps {
   variant?: "default" | "minimal";
@@ -21,7 +22,15 @@ const navigation = [
 const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { savedCount } = useSavedJobs();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setMobileMenuOpen(false);
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -66,25 +75,34 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
                 >
                   <Bookmark className={`h-4 w-4 ${isActive('/saved-jobs') ? 'fill-current' : ''}`} />
                   Saved Jobs
-                  {savedCount > 0 && (
+                  {user && savedCount > 0 && (
                     <span className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-[11px] font-bold text-primary-foreground flex items-center justify-center">
                       {savedCount > 9 ? '9+' : savedCount}
                     </span>
                   )}
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <LogIn className="h-4 w-4" />
-                  Login
-                </Button>
-              </Link>
-              <Link to="/profile">
-                <Button size="sm" className="gap-2 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
-                  <User className="h-4 w-4" />
-                  Profile
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/profile">
+                    <Button size="sm" className="gap-2 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                      <User className="h-4 w-4" />
+                      {user.firstName}
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="sm" className="gap-2" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Link to="/login">
+                  <Button size="sm" className="gap-2 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                    <LogIn className="h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu */}
@@ -135,18 +153,27 @@ const Header = ({ variant = "default", showBackLink = false }: HeaderProps) => {
                   </nav>
 
                   <div className="border-t pt-6 flex flex-col gap-3">
-                    <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full gap-2">
-                        <LogIn className="h-4 w-4" />
-                        Login
-                      </Button>
-                    </Link>
-                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full gap-2 gradient-primary border-0">
-                        <User className="h-4 w-4" />
-                        Profile
-                      </Button>
-                    </Link>
+                    {user ? (
+                      <>
+                        <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                          <Button className="w-full gap-2 gradient-primary border-0">
+                            <User className="h-4 w-4" />
+                            {user.firstName}
+                          </Button>
+                        </Link>
+                        <Button variant="outline" className="w-full gap-2" onClick={handleLogout}>
+                          <LogOut className="h-4 w-4" />
+                          Logout
+                        </Button>
+                      </>
+                    ) : (
+                      <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <Button className="w-full gap-2 gradient-primary border-0">
+                          <LogIn className="h-4 w-4" />
+                          Login
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </SheetContent>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -47,9 +48,10 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { user: authUser, logout } = useAuth();
 
-  // For now, use a hardcoded email - in production this would come from auth context
-  const userEmail = "sarah.johnson@example.com";
+  const userEmail = authUser?.email ?? "";
 
   // Form state for editing
   const [formData, setFormData] = useState({
@@ -65,6 +67,7 @@ const Profile = () => {
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ['userProfile', userEmail],
     queryFn: () => userApi.getUserProfile(userEmail),
+    enabled: !!userEmail,
     retry: false,
   });
 
@@ -143,19 +146,25 @@ const Profile = () => {
     },
   });
 
-  // Initialize form data when user data is loaded
+  // Initialize form data when user data is loaded (fall back to auth user)
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
+        firstName: user.firstName || authUser?.firstName || "",
+        lastName: user.lastName || authUser?.lastName || "",
         phone: user.phone || "",
         location: user.location || "",
         title: user.title || "",
         company: user.company || "",
       });
+    } else if (authUser) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: authUser.firstName || "",
+        lastName: authUser.lastName || "",
+      }));
     }
-  }, [user]);
+  }, [user, authUser]);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -235,7 +244,30 @@ const Profile = () => {
     );
   }
 
-  if (!user) {
+  // If no full profile yet, build a minimal display from auth data
+  const displayUser = user ?? (authUser ? {
+    _id: authUser._id,
+    firstName: authUser.firstName,
+    lastName: authUser.lastName,
+    fullName: `${authUser.firstName} ${authUser.lastName}`,
+    email: authUser.email,
+    avatar: authUser.avatar,
+    phone: "",
+    location: "",
+    title: "",
+    company: "",
+    bio: "",
+    skills: [] as string[],
+    experience: [] as unknown[],
+    education: [] as unknown[],
+    certifications: [] as unknown[],
+    socialLinks: {},
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  } : null);
+
+  if (!displayUser) {
     return (
       <>
         <Helmet>
@@ -273,6 +305,8 @@ const Profile = () => {
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
     return `${Math.floor(diffDays / 30)} months ago`;
   };
+
+  const user = displayUser;
 
   return (
     <>
@@ -910,7 +944,7 @@ const Profile = () => {
                       </div>
 
                       <div className="border-t border-border/50 mt-4 pt-4">
-                        <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
+                        <button onClick={() => { logout(); navigate('/'); }} className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center">
                               <LogOut className="h-5 w-5" />
