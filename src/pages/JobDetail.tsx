@@ -22,23 +22,27 @@ const JobDetail = () => {
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const { toast } = useToast();
 
-  // Add fl_attachment to Cloudinary URL to force browser download
-  const getDownloadUrl = (url: string) => {
+  // Build Cloudinary download URL with fl_attachment:filename so browser saves as .pdf
+  const getDownloadUrl = (url: string, filename: string) => {
+    const name = (filename.endsWith('.pdf') ? filename : `${filename}.pdf`).replace(/\s+/g, '_');
     if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-      return url.replace('/upload/', '/upload/fl_attachment/');
+      return url.replace('/upload/', `/upload/fl_attachment:${name}/`);
     }
     return url;
   };
 
   const downloadPdf = (url: string, filename: string) => {
-    const name = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
     const a = document.createElement('a');
-    a.href = getDownloadUrl(url);
-    a.download = name;
+    a.href = getDownloadUrl(url, filename);
+    a.target = '_blank';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
+
+  // Google Docs Viewer URL — only way to preview Cloudinary raw PDFs without auto-download
+  const getPreviewUrl = (url: string) =>
+    `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
 
   const { data: job, isLoading, error } = useQuery({
     queryKey: ['job', id],
@@ -301,7 +305,7 @@ const JobDetail = () => {
                       ) : (
                         <iframe
                           key={job.jobDescriptionPdf.url}
-                          src={resolveFileUrl(job.jobDescriptionPdf.url)}
+                          src={getPreviewUrl(resolveFileUrl(job.jobDescriptionPdf.url))}
                           className="w-full h-full border-0"
                           title="Job Description PDF"
                           onLoad={() => setIsPdfLoading(false)}
