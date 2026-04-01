@@ -5,8 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Share2, Building2, ArrowLeft, FileText, Download, ExternalLink, Calendar, Clock } from "lucide-react";
+import { Bookmark, Share2, Building2, ArrowLeft, FileText, Download, ExternalLink, Calendar, Clock, Copy, Check, MessageCircle, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { jobApi, BACKEND_URL } from "@/lib/api";
 import DynamicSection from "@/components/jobs/DynamicSection";
 import DynamicSidebarField from "@/components/jobs/DynamicSidebarField";
@@ -19,6 +20,7 @@ const JobDetail = () => {
   const [isPdfExpanded, setIsPdfExpanded] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(true);
   const [pdfError, setPdfError] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const { toast } = useToast();
 
@@ -47,6 +49,33 @@ const JobDetail = () => {
   // Google Docs Viewer URL — only way to preview Cloudinary raw PDFs without auto-download
   const getPreviewUrl = (url: string) =>
     `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+
+  const shareUrl = window.location.href;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: job?.title, text: `Check out this job: ${job?.title}`, url: shareUrl });
+      } catch { /* user cancelled */ }
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    const text = encodeURIComponent(`Check out this job: ${job?.title}\n${shareUrl}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  const handleGmailShare = () => {
+    const subject = encodeURIComponent(`Job Opportunity: ${job?.title}`);
+    const body = encodeURIComponent(`Hi,\n\nI found this job that might interest you:\n${job?.title}\n\n${shareUrl}`);
+    window.open(`https://mail.google.com/mail/?view=cm&su=${subject}&body=${body}`, '_blank');
+  };
 
   const { data: job, isLoading, error } = useQuery({
     queryKey: ['job', id],
@@ -190,18 +219,37 @@ const JobDetail = () => {
                       <Bookmark className={`h-4 w-4 mr-2 ${isJobSaved(job._id) ? 'fill-current' : ''}`} />
                       {isJobSaved(job._id) ? "Saved" : "Save"}
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="h-12 flex-1"
-                      onClick={() => {
-                        navigator.clipboard.writeText(window.location.href);
-                        toast({ title: "Link Copied!", description: "Job link has been copied to clipboard." });
-                      }}
-                    >
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="lg" className="h-12 flex-1">
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Share
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-52">
+                        {typeof navigator !== 'undefined' && 'share' in navigator && (
+                          <>
+                            <DropdownMenuItem onClick={handleNativeShare} className="gap-3 cursor-pointer">
+                              <Share2 className="h-4 w-4 text-primary" />
+                              <span>Share via Apps</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                          </>
+                        )}
+                        <DropdownMenuItem onClick={handleCopyLink} className="gap-3 cursor-pointer">
+                          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-muted-foreground" />}
+                          <span>{copied ? "Link Copied!" : "Copy Link"}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleWhatsAppShare} className="gap-3 cursor-pointer">
+                          <MessageCircle className="h-4 w-4 text-green-500" />
+                          <span>Share on WhatsApp</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleGmailShare} className="gap-3 cursor-pointer">
+                          <Mail className="h-4 w-4 text-red-500" />
+                          <span>Share via Gmail</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>
