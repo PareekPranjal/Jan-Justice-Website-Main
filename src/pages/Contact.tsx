@@ -8,7 +8,7 @@ import emailjs from '@emailjs/browser';
 
 const EMAILJS_SERVICE_ID = 'service_p7f42q9';
 const EMAILJS_TEMPLATE_ID = 'template_guz7i41';
-const EMAILJS_PUBLIC_KEY = 'TOMlDE-2YNLLe-XzR:';
+const EMAILJS_PUBLIC_KEY = 'TOMlDE-2YNLLe-XzR';
 
 const CONTACT_EMAIL = "connect@janjustice.com";
 const CONTACT_PHONE = "+917023076680";
