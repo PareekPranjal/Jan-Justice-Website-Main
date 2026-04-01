@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/Header";
@@ -13,10 +13,13 @@ import DynamicSection from "@/components/jobs/DynamicSection";
 import DynamicSidebarField from "@/components/jobs/DynamicSidebarField";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const [isPdfExpanded, setIsPdfExpanded] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(true);
   const [pdfError, setPdfError] = useState(false);
@@ -207,6 +210,21 @@ const JobDetail = () => {
                       size="lg"
                       className={`h-12 flex-1 ${isJobSaved(job._id) ? 'bg-primary/10 border-primary/30 text-primary' : ''}`}
                       onClick={() => {
+                        if (!user) {
+                          toast({
+                            title: "Login required",
+                            description: "Please login to save jobs.",
+                            action: (
+                              <button
+                                onClick={() => navigate('/login', { state: { from: location.pathname } })}
+                                className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground"
+                              >
+                                Login
+                              </button>
+                            ),
+                          });
+                          return;
+                        }
                         toggleSaveJob(job._id);
                         toast({
                           title: isJobSaved(job._id) ? "Job removed" : "Job saved",
