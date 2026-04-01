@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, Calendar } from "lucide-react";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
 import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/hooks/use-toast";
 
 interface JobCardProps {
   id: string;
@@ -20,24 +19,12 @@ const JobCard = ({ id, title, company, department, description, postDate, tags }
   const location = useLocation();
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
   const { user } = useAuth();
-  const { toast } = useToast();
   const saved = isJobSaved(id);
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
-      toast({
-        title: "Login required",
-        description: "Please login to save jobs.",
-        action: (
-          <button
-            onClick={() => navigate('/login', { state: { from: location.pathname } })}
-            className="inline-flex h-8 items-center justify-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground"
-          >
-            Login
-          </button>
-        ),
-      });
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
     toggleSaveJob(id);

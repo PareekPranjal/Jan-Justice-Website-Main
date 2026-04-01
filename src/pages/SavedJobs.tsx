@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { jobApi, Job, BACKEND_URL } from "@/lib/api";
+import { SavedJob, BACKEND_URL } from "@/lib/api";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
 import {
   Bookmark,
@@ -17,16 +16,9 @@ import {
 } from "lucide-react";
 
 const SavedJobs = () => {
-  const { savedJobIds, isJobSaved, toggleSaveJob } = useSavedJobs();
+  const { savedJobs, savedJobIds, toggleSaveJob, isLoading } = useSavedJobs();
 
-  const { data: allJobs = [], isLoading } = useQuery({
-    queryKey: ["jobs"],
-    queryFn: () => jobApi.getJobs(),
-  });
-
-  const savedJobs = allJobs.filter((job: Job) => savedJobIds.includes(job._id));
-
-  const formatSalary = (job: Job) => {
+  const formatSalary = (job: SavedJob) => {
     if (!job.salary?.min && !job.salary?.max) return null;
     const fmt = (n: number) => {
       if (n >= 100000) return `${(n / 100000).toFixed(1)}L`;
@@ -118,7 +110,7 @@ const SavedJobs = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {savedJobs.map((job: Job) => (
+                {savedJobs.map((job: SavedJob) => (
                   <div
                     key={job._id}
                     className="group relative rounded-2xl border border-border/60 bg-card p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"

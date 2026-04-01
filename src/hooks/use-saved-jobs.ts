@@ -1,36 +1,49 @@
-import { useCallback, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { toggleSaveJob as toggleAction, syncFromStorage } from '@/store/savedJobsSlice';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
+import { userApi, SavedJob } from '@/lib/api';
 
 export function useSavedJobs() {
-  const dispatch = useAppDispatch();
-  const savedJobIds = useAppSelector((state) => state.savedJobs.ids);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Cross-tab sync
-  useEffect(() => {
-    const handler = (e: StorageEvent) => {
-      if (e.key === 'savedJobs') {
-        dispatch(syncFromStorage());
-      }
-    };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, [dispatch]);
+  const { data: savedJobs = [], isLoading } = useQuery<SavedJob[]>({
+    queryKey: ['savedJobs', user?.email],
+    queryFn: () => userApi.getSavedJobs(user!.email),
+    enabled: !!user?.email,
+  });
+
+  const savedJobIds = savedJobs.map((sj) => sj._id);
 
   const isJobSaved = useCallback(
-    (jobId: string) => savedJobIds.includes(jobId),
-    [savedJobIds]
+    (jobId: string) => savedJobs.some((sj) => sj._id === jobId),
+    [savedJobs]
   );
 
   const toggleSaveJob = useCallback(
-    (jobId: string) => dispatch(toggleAction(jobId)),
-    [dispatch]
+    async (jobId: string) => {
+      if (!user) return;
+      const existing = savedJobs.find((sj) => sj._id === jobId);
+      try {
+        if (existing) {
+          await userApi.unsaveJob(existing.savedJobId);
+        } else {
+          await userApi.saveJob(user.email, jobId);
+        }
+        queryClient.invalidateQueries({ queryKey: ['savedJobs', user.email] });
+      } catch {
+        // callers handle errors via toast
+      }
+    },
+    [user, savedJobs, queryClient]
   );
 
   return {
+    savedJobs,
     savedJobIds,
-    savedCount: savedJobIds.length,
+    savedCount: savedJobs.length,
     isJobSaved,
     toggleSaveJob,
+    isLoading,
   };
 }
