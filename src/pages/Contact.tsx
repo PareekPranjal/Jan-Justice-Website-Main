@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MessageCircle, Send, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Mail, Phone, MessageCircle, Send, MapPin, Clock, ArrowRight, Loader2 } from "lucide-react";
+import emailjs from '@emailjs/browser';
+
+const EMAILJS_SERVICE_ID = 'service_p7f42q9';
+const EMAILJS_TEMPLATE_ID = 'template_guz7i41';
+const EMAILJS_PUBLIC_KEY = 'TOMlDE-2YNLLe-XzR:';
 
 const CONTACT_EMAIL = "connect@janjustice.com";
 const CONTACT_PHONE = "+917023076680";
@@ -12,16 +17,36 @@ const WHATSAPP_NUMBER = "917023076680";
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mailtoLink = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(form.subject || "Query from Jan Justice")}&body=${encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`)}`;
-    window.open(mailtoLink, "_self");
-    setSubmitted(true);
+    setSending(true);
+    setError("");
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+      setSubmitted(true);
+    } catch {
+      setError("Failed to send message. Please try again or email us directly.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const openWhatsApp = () => {
@@ -112,10 +137,9 @@ const Contact = () => {
                       <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-500/10 mb-4">
                         <Send className="h-8 w-8 text-green-500" />
                       </div>
-                      <h3 className="text-lg font-display font-bold mb-2">Message Ready!</h3>
+                      <h3 className="text-lg font-display font-bold mb-2">Message Sent!</h3>
                       <p className="text-muted-foreground text-sm mb-4">
-                        Your email client should have opened with your message. If not, you can email us directly at{" "}
-                        <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary font-medium hover:underline">{CONTACT_EMAIL}</a>.
+                        Thank you! We've received your message and will get back to you within 24 hours.
                       </p>
                       <Button variant="outline" onClick={() => { setSubmitted(false); setForm({ name: "", email: "", subject: "", message: "" }); }}>
                         Send another message
@@ -123,6 +147,9 @@ const Contact = () => {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
+                      {error && (
+                        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">{error}</div>
+                      )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-medium mb-1.5 block">Your Name</label>
@@ -179,9 +206,9 @@ const Contact = () => {
                           className="w-full px-4 py-3 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
                         />
                       </div>
-                      <Button type="submit" className="w-full h-12 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all gap-2">
-                        <Send className="h-4 w-4" />
-                        Send Message
+                      <Button type="submit" disabled={sending} className="w-full h-12 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all gap-2">
+                        {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                        {sending ? "Sending..." : "Send Message"}
                       </Button>
                     </form>
                   )}
