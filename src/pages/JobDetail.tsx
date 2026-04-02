@@ -204,8 +204,7 @@ const JobDetail = () => {
                   <Button
                     size="lg"
                     className="h-12 px-8 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300"
-                    onClick={() => job.applyUrl && window.open(job.applyUrl, '_blank')}
-                    disabled={!job.applyUrl}
+                    onClick={() => job.applyUrl ? window.open(job.applyUrl, '_blank') : undefined}
                   >
                     Apply Now
                   </Button>
@@ -457,8 +456,7 @@ const JobDetail = () => {
 
                   <Button
                     className="w-full h-12 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300"
-                    onClick={() => job.applyUrl && window.open(job.applyUrl, '_blank')}
-                    disabled={!job.applyUrl}
+                    onClick={() => job.applyUrl ? window.open(job.applyUrl, '_blank') : undefined}
                   >
                     Apply Now
                   </Button>
