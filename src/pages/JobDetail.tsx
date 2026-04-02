@@ -201,7 +201,12 @@ const JobDetail = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:text-right">
-                  <Button size="lg" className="h-12 px-8 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                  <Button
+                    size="lg"
+                    className="h-12 px-8 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300"
+                    onClick={() => job.applyUrl && window.open(job.applyUrl, '_blank')}
+                    disabled={!job.applyUrl}
+                  >
                     Apply Now
                   </Button>
                   <div className="flex gap-2">
@@ -450,7 +455,11 @@ const JobDetail = () => {
 
                   <div className="border-t border-border/50 my-6" />
 
-                  <Button className="w-full h-12 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300">
+                  <Button
+                    className="w-full h-12 gradient-primary border-0 shadow-glow hover:shadow-glow-lg transition-all duration-300"
+                    onClick={() => job.applyUrl && window.open(job.applyUrl, '_blank')}
+                    disabled={!job.applyUrl}
+                  >
                     Apply Now
                   </Button>
                 </div>
