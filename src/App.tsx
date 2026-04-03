@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { store } from "@/store";
 import { PageLoader } from "@/components/ui/loader";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { useVisitorTracking } from "@/hooks/use-visitor-tracking";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -48,6 +49,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   const { user, isLoading } = useAuth();
+  useVisitorTracking();
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
