@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Calendar } from "lucide-react";
+import { Bookmark, Calendar, Clock } from "lucide-react";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
 import { useAuth } from "@/context/AuthContext";
 
@@ -11,10 +11,11 @@ interface JobCardProps {
   department: string;
   description: string;
   postDate?: string;
+  expiryDate?: string;
   tags?: string[];
 }
 
-const JobCard = ({ id, title, company, department, description, postDate, tags }: JobCardProps) => {
+const JobCard = ({ id, title, company, department, description, postDate, expiryDate, tags }: JobCardProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
@@ -62,12 +63,20 @@ const JobCard = ({ id, title, company, department, description, postDate, tags }
       <div className="text-sm text-muted-foreground leading-relaxed pt-4 mt-1 border-t border-dashed border-border line-clamp-2">
         {description}
       </div>
-      {postDate && (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Calendar className="h-3.5 w-3.5" />
-          <span>Posted {new Date(postDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-        </div>
-      )}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        {expiryDate && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="h-3.5 w-3.5" />
+            <span>Apply by {new Date(expiryDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+          </div>
+        )}
+        {postDate && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            <span>Posted {new Date(postDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+          </div>
+        )}
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
         <Button
           onClick={() => navigate(`/jobs/${id}`)}
