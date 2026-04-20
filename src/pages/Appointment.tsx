@@ -285,7 +285,7 @@ function RescheduleModal({ appt, onClose, onSaved }: RescheduleModalProps) {
 
 function GuestLanding() {
   const HOW_IT_WORKS = [
-    { Icon: CalendarDays, title: "Pick a Service",     desc: "Choose Legal Consultation or Career Coaching — both are free." },
+    { Icon: CalendarDays, title: "Pick a Service",     desc: "Choose Legal Consultation or Career Coaching based on your needs." },
     { Icon: Clock,        title: "Select Date & Time", desc: "Browse available slots and pick what works for you." },
     { Icon: UserCheck,    title: "Submit Request",     desc: "Fill your details and send the booking request to admin." },
     { Icon: MessageSquare, title: "Get Confirmed",     desc: "Admin approves your slot and you're ready to connect." },
@@ -295,7 +295,7 @@ function GuestLanding() {
     <>
       <Helmet>
         <title>Consultancy | Jan Justice</title>
-        <meta name="description" content="Book a free legal or career consultation with Jan Justice experts." />
+        <meta name="description" content="Book a legal or career consultation with Jan Justice experts." />
       </Helmet>
       <div className="bg-background min-h-screen flex flex-col">
         <Header />
@@ -307,9 +307,9 @@ function GuestLanding() {
               <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mx-auto">
                 <Calendar className="h-8 w-8" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">Book a Free Consultation</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Book a Consultation</h1>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Get expert guidance from experienced Indian legal professionals — no cost, no commitment.
+                Get expert guidance from experienced Indian legal professionals.
               </p>
 
               {/* Login CTA */}
@@ -330,7 +330,7 @@ function GuestLanding() {
                   state={{ from: "/appointment" }}
                   className="text-sm text-primary font-medium hover:underline"
                 >
-                  Create a free account →
+                  Create an account →
                 </Link>
               </div>
             </div>
@@ -350,7 +350,7 @@ function GuestLanding() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-sm text-gray-900">{title}</span>
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Free</span>
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Book Now</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{description}</p>
                     </div>
@@ -627,7 +627,7 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
     <>
       <Helmet>
         <title>Book Consultation | Jan Justice</title>
-        <meta name="description" content="Book a free legal or career consultation." />
+        <meta name="description" content="Book a legal or career consultation." />
       </Helmet>
 
       {/* Reschedule modal — rendered at root so it overlays everything */}
@@ -651,7 +651,7 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900">Book a Consultation</h1>
               <p className="text-muted-foreground mt-2 text-sm">
-                Free consultation — choose a service, pick a slot, and we'll confirm.
+                Choose a service, pick a slot, and we'll confirm your booking.
               </p>
             </div>
 
@@ -728,7 +728,7 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="font-semibold text-sm">{title}</span>
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Free</span>
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Book Now</span>
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">{description}</p>
                               </div>
