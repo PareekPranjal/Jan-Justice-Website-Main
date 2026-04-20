@@ -425,8 +425,9 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
   const [serviceType,    setServiceType]    = useState<"legal" | "career">("legal");
   const [selectedDate,   setSelectedDate]   = useState<Date | null>(null);
   const [selectedTime,   setSelectedTime]   = useState("");
-  const [customTime,     setCustomTime]     = useState("");
-  const [useCustomTime,  setUseCustomTime]  = useState(false);
+  const [customTime,      setCustomTime]      = useState("");
+  const [customTimeError, setCustomTimeError] = useState("");
+  const [useCustomTime,   setUseCustomTime]   = useState(false);
   const [clientName,     setClientName]     = useState(`${user.firstName} ${user.lastName}`);
   const [clientEmail,    setClientEmail]    = useState(user.email);
   const [clientPhone,    setClientPhone]    = useState("");
@@ -509,8 +510,12 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
 
   // ─── Validation ────────────────────────────────────────────────────────────
 
+  // Validates "H:MM AM/PM" or "HH:MM AM/PM" — hours 1-12, minutes 00-59
+  const VALID_TIME = /^(1[0-2]|0?[1-9]):([0-5][0-9])\s?(AM|PM|am|pm)$/;
+  const isCustomTimeValid = !useCustomTime || VALID_TIME.test(customTime.trim());
+
   const service = SERVICES.find(s => s.id === serviceType)!;
-  const activeTime = useCustomTime ? customTime.trim() : selectedTime;
+  const activeTime = useCustomTime ? customTime.trim().toUpperCase() : selectedTime;
 
   const validateDetails = () => {
     let ok = true;
@@ -802,19 +807,36 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
                                   <input
                                     type="checkbox"
                                     checked={useCustomTime}
-                                    onChange={e => { setUseCustomTime(e.target.checked); if (!e.target.checked) setCustomTime(""); }}
+                                    onChange={e => { setUseCustomTime(e.target.checked); if (!e.target.checked) { setCustomTime(""); setCustomTimeError(""); } }}
                                     className="accent-primary"
                                   />
                                   <span className="text-xs font-medium text-gray-700">Request a custom time</span>
                                 </label>
                                 {useCustomTime && (
-                                  <input
-                                    type="text"
-                                    value={customTime}
-                                    onChange={e => setCustomTime(e.target.value)}
-                                    placeholder="e.g. 11:00 AM or 2:00 PM"
-                                    className="w-full px-3 py-2 border border-primary/30 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                                  />
+                                  <div className="space-y-1">
+                                    <input
+                                      type="text"
+                                      value={customTime}
+                                      onChange={e => {
+                                        const val = e.target.value;
+                                        setCustomTime(val);
+                                        if (val.trim() && !VALID_TIME.test(val.trim())) {
+                                          setCustomTimeError("Use format like 11:00 AM or 2:30 PM (hours 1–12)");
+                                        } else {
+                                          setCustomTimeError("");
+                                        }
+                                      }}
+                                      placeholder="e.g. 11:00 AM or 2:30 PM"
+                                      className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors ${
+                                        customTimeError ? "border-red-400 bg-red-50" : "border-primary/30"
+                                      }`}
+                                    />
+                                    {customTimeError && (
+                                      <p className="text-xs text-red-500 flex items-center gap-1">
+                                        <AlertCircle className="h-3 w-3 shrink-0" /> {customTimeError}
+                                      </p>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -827,7 +849,7 @@ function AuthenticatedBooking({ user }: { user: NonNullable<ReturnType<typeof us
                         </button>
                         <button
                           onClick={() => setStep(3)}
-                          disabled={!selectedDate || (!useCustomTime && !selectedTime) || (useCustomTime && !customTime.trim())}
+                          disabled={!selectedDate || (!useCustomTime && !selectedTime) || (useCustomTime && (!customTime.trim() || !isCustomTimeValid))}
                           className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           Next <ArrowRight className="h-4 w-4" />
