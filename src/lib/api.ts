@@ -2,6 +2,11 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://jan-justice-bancked.onrender.com/api';
 export const BACKEND_URL = API_BASE_URL.replace(/\/api$/, '');
 
+const userAuthHeaders = (): Record<string, string> => {
+  const token = localStorage.getItem('jj_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -390,6 +395,7 @@ export interface Appointment {
   notes?: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   confirmationNumber: string;
+  transactionId?: string;
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -420,7 +426,7 @@ export const appointmentApi = {
 
     const url = `${API_BASE_URL}/appointments${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, { headers: userAuthHeaders() });
     const result: ApiResponse<Appointment[]> = await response.json();
 
     if (!response.ok) {
@@ -482,9 +488,7 @@ export const appointmentApi = {
   async createAppointment(appointmentData: Partial<Appointment>): Promise<Appointment> {
     const response = await fetch(`${API_BASE_URL}/appointments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', ...userAuthHeaders() },
       body: JSON.stringify(appointmentData),
     });
 
@@ -505,9 +509,7 @@ export const appointmentApi = {
   async updateAppointment(id: string, appointmentData: Partial<Appointment>): Promise<Appointment> {
     const response = await fetch(`${API_BASE_URL}/appointments/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', ...userAuthHeaders() },
       body: JSON.stringify(appointmentData),
     });
 
@@ -528,6 +530,7 @@ export const appointmentApi = {
   async cancelAppointment(id: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/appointments/${id}`, {
       method: 'DELETE',
+      headers: userAuthHeaders(),
     });
 
     const result: ApiResponse<never> = await response.json();
@@ -535,6 +538,39 @@ export const appointmentApi = {
     if (!response.ok) {
       throw new Error(result.message || 'Failed to cancel appointment');
     }
+  },
+};
+
+export interface PublicSettings {
+  consultationFee: number;
+  upiId: string;
+  upiQrUrl: string;
+}
+
+export interface CouponResult {
+  code: string;
+  discountType: 'percent' | 'fixed';
+  discountValue: number;
+}
+
+export const settingsApi = {
+  async getPublicSettings(): Promise<PublicSettings> {
+    const response = await fetch(`${API_BASE_URL}/settings/public`);
+    const result: ApiResponse<PublicSettings> = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch settings');
+    return result.data || { consultationFee: 500, upiId: '', upiQrUrl: '' };
+  },
+
+  async validateCoupon(code: string): Promise<CouponResult> {
+    const response = await fetch(`${API_BASE_URL}/settings/validate-coupon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const result: ApiResponse<CouponResult> = await response.json();
+    if (!result.success) throw new Error(result.message || 'Invalid coupon');
+    if (!result.data) throw new Error('Invalid coupon');
+    return result.data;
   },
 };
 
