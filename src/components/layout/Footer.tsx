@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { Briefcase, GraduationCap, Calendar, Mail, Phone, MapPin, Youtube } from "lucide-react";
+import { Briefcase, GraduationCap, Calendar, Mail, Phone, MapPin, Youtube, Newspaper } from "lucide-react";
 
 const footerLinks = {
   platform: [
     { name: "Jobs", href: "/jobs", icon: Briefcase },
     { name: "Courses", href: "/courses", icon: GraduationCap },
+    { name: "Blogs", href: "/blogs", icon: Newspaper },
     { name: "Consultancy", href: "/appointment", icon: Calendar },
   ],
   contact: [

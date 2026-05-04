@@ -8,9 +8,9 @@ import JobsTable from "@/components/home/JobsTable";
 import CourseCard from "@/components/home/CourseCard";
 import ConsultantSection from "@/components/home/ConsultantSection";
 import YouTubeSection from "@/components/home/YouTubeSection";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Calendar, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { courseApi } from "@/lib/api";
+import { courseApi, blogApi } from "@/lib/api";
 
 const Index = () => {
   // Fetch courses for homepage
@@ -21,6 +21,12 @@ const Index = () => {
 
   // Show only first 3 courses
   const popularCourses = allCourses.slice(0, 3);
+
+  // Fetch featured blogs for homepage
+  const { data: featuredBlogs = [] } = useQuery({
+    queryKey: ['featuredBlogs'],
+    queryFn: () => blogApi.getFeaturedBlogs(),
+  });
 
   const features = [
     {
@@ -113,6 +119,79 @@ const Index = () => {
 
           {/* YouTube Channel Section */}
           <YouTubeSection />
+
+          {/* Featured Blogs Section — only renders when there are featured blogs */}
+          {featuredBlogs.length > 0 && (
+            <section className="w-full py-16 lg:py-20 bg-muted/30">
+              <div className="container">
+                <div className="max-w-6xl mx-auto">
+                  <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-display font-bold">From the Blog</h2>
+                      <p className="text-muted-foreground mt-1">Latest insights and updates from our team</p>
+                    </div>
+                    <Link to="/blogs" className="hidden sm:flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                      View all blogs
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {featuredBlogs.map((blog, i) => (
+                      <Link
+                        key={blog._id}
+                        to={`/blogs/${blog._id}`}
+                        className="group bg-card border border-border/60 rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all duration-300 flex flex-col animate-fade-in"
+                        style={{ animationDelay: `${i * 80}ms` }}
+                      >
+                        {blog.image?.url ? (
+                          <div className="aspect-video overflow-hidden bg-muted">
+                            <img
+                              src={blog.image.url}
+                              alt={blog.title}
+                              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          <div className="aspect-video bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                            <Newspaper className="h-10 w-10 text-primary/40" />
+                          </div>
+                        )}
+                        <div className="p-5 flex-1 flex flex-col gap-3">
+                          <h3 className="text-lg font-bold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                            {blog.title}
+                          </h3>
+                          {blog.excerpt && (
+                            <p className="text-sm text-muted-foreground line-clamp-3">{blog.excerpt}</p>
+                          )}
+                          <div className="mt-auto pt-3 flex items-center justify-between border-t border-border/40">
+                            {blog.createdAt && (
+                              <span className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+                                <Calendar className="h-3.5 w-3.5" />
+                                {new Date(blog.createdAt).toLocaleDateString('en-IN', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                            )}
+                            <span className="text-sm font-semibold text-primary inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                              Read more
+                              <ArrowRight className="h-4 w-4" />
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link to="/blogs" className="flex sm:hidden items-center justify-center gap-2 text-sm font-semibold text-primary mt-6">
+                    View all blogs
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Popular Courses Section */}
           {/* <section className="w-full py-16 lg:py-20 bg-muted/30">

@@ -382,6 +382,50 @@ export const courseApi = {
   },
 };
 
+export interface BlogSection {
+  type: 'heading' | 'paragraph';
+  text: string;
+}
+
+export interface Blog {
+  _id: string;
+  title: string;
+  excerpt?: string;
+  image?: {
+    url?: string;
+    publicId?: string;
+  };
+  sections: BlogSection[];
+  isPublished: boolean;
+  isFeatured: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const blogApi = {
+  async getBlogs(): Promise<Blog[]> {
+    const response = await fetch(`${API_BASE_URL}/blogs`);
+    const result: ApiResponse<Blog[]> = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch blogs');
+    return result.data || [];
+  },
+
+  async getFeaturedBlogs(): Promise<Blog[]> {
+    const response = await fetch(`${API_BASE_URL}/blogs/featured`);
+    const result: ApiResponse<Blog[]> = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch featured blogs');
+    return result.data || [];
+  },
+
+  async getBlogById(id: string): Promise<Blog> {
+    const response = await fetch(`${API_BASE_URL}/blogs/${id}`);
+    const result: ApiResponse<Blog> = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch blog');
+    if (!result.data) throw new Error('Blog not found');
+    return result.data;
+  },
+};
+
 export interface Appointment {
   _id: string;
   serviceType: 'legal' | 'career';

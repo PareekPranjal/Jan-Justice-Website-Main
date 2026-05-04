@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Briefcase, GraduationCap, Calendar, MessageCircle, LogIn, User, Bookmark, LogOut } from "lucide-react";
+import { Menu, Home, Briefcase, GraduationCap, Calendar, MessageCircle, LogIn, User, Bookmark, LogOut, Newspaper } from "lucide-react";
 import { useSavedJobs } from "@/hooks/use-saved-jobs";
 import { useAuth } from "@/context/AuthContext";
 
@@ -16,6 +16,7 @@ const navigation = [
   { name: "Consultancy", href: "/appointment", icon: Calendar },
   { name: "Courses", href: "/courses", icon: GraduationCap },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
+  { name: "Blogs", href: "/blogs", icon: Newspaper },
   { name: "Contact", href: "/contact", icon: MessageCircle },
 ];
 

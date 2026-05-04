@@ -25,6 +25,8 @@ const Login = lazy(() => import("./pages/Login"));
 const Profile = lazy(() => import("./pages/Profile"));
 const SavedJobs = lazy(() => import("./pages/SavedJobs"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Blogs = lazy(() => import("./pages/Blogs"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -63,6 +65,8 @@ function AppRoutes() {
         <Route path="/appointment" element={<Appointment />} />
         <Route path="/appointment-dev" element={<AppointmentDevPage />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/:id" element={<BlogDetail />} />
         {/* Auth */}
         <Route path="/login" element={!isLoading && user ? <Navigate to="/" replace /> : <Login />} />
         {/* Protected */}
