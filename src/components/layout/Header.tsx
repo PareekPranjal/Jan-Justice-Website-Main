@@ -16,7 +16,7 @@ const navigation = [
   { name: "Consultancy", href: "/appointment", icon: Calendar },
   { name: "Courses", href: "/courses", icon: GraduationCap },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
-  { name: "Blogs", href: "/blogs", icon: Newspaper },
+  { name: "Legal News", href: "/blogs", icon: Newspaper },
   { name: "Contact", href: "/contact", icon: MessageCircle },
 ];
 

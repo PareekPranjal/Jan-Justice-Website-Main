@@ -127,11 +127,11 @@ const Index = () => {
                 <div className="max-w-6xl mx-auto">
                   <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
                     <div>
-                      <h2 className="text-2xl md:text-3xl font-display font-bold">From the Blog</h2>
-                      <p className="text-muted-foreground mt-1">Latest insights and updates from our team</p>
+                      <h2 className="text-2xl md:text-3xl font-display font-bold">Latest Legal News</h2>
+                      <p className="text-muted-foreground mt-1">Recent legal updates and insights from our team</p>
                     </div>
                     <Link to="/blogs" className="hidden sm:flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-                      View all blogs
+                      View all news
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </div>
@@ -185,7 +185,7 @@ const Index = () => {
                     ))}
                   </div>
                   <Link to="/blogs" className="flex sm:hidden items-center justify-center gap-2 text-sm font-semibold text-primary mt-6">
-                    View all blogs
+                    View all news
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>

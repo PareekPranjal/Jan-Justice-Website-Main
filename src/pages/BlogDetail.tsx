@@ -24,13 +24,13 @@ const BlogDetail = () => {
         <Header />
         <main className="flex-grow flex items-center justify-center px-4">
           <div className="text-center max-w-md mx-auto">
-            <h1 className="text-2xl font-display font-bold mb-3">Blog not found</h1>
+            <h1 className="text-2xl font-display font-bold mb-3">Article not found</h1>
             <p className="text-muted-foreground mb-6">
-              We couldn't find the blog you're looking for.
+              We couldn't find the article you're looking for.
             </p>
             <Link to="/blogs" className="text-primary font-semibold hover:underline inline-flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
-              Back to all blogs
+              Back to Legal News
             </Link>
           </div>
         </main>
@@ -55,7 +55,7 @@ const BlogDetail = () => {
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6"
             >
               <ArrowLeft className="h-4 w-4" />
-              All blogs
+              All Legal News
             </Link>
 
             {/* Title */}

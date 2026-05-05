@@ -20,8 +20,8 @@ const Blogs = () => {
     return (
       <>
         <Helmet>
-          <title>Blogs - Coming Soon | Jan Justice</title>
-          <meta name="description" content="Our blogs system is coming soon. Stay tuned!" />
+          <title>Legal News - Coming Soon | Jan Justice</title>
+          <meta name="description" content="Our Legal News section is coming soon. Stay tuned!" />
         </Helmet>
         <div className="bg-background min-h-screen flex flex-col">
           <Header />
@@ -34,7 +34,7 @@ const Blogs = () => {
                 Coming Soon
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed">
-                Our Blogs system is currently under development. We'll be live shortly — stay tuned!
+                Our Legal News system is currently under development. We'll be live shortly — stay tuned!
               </p>
             </div>
           </main>
@@ -47,8 +47,8 @@ const Blogs = () => {
   return (
     <>
       <Helmet>
-        <title>Blogs | Jan Justice</title>
-        <meta name="description" content="Read the latest articles, legal insights, and career advice from Jan Justice." />
+        <title>Legal News | Jan Justice</title>
+        <meta name="description" content="Read the latest Legal News, articles, and insights from Jan Justice." />
       </Helmet>
       <div className="bg-background min-h-screen flex flex-col">
         <Header />
@@ -59,10 +59,10 @@ const Blogs = () => {
                 <Newspaper className="h-7 w-7" />
               </div>
               <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">
-                Latest Articles
+                Legal News
               </h1>
               <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
-                Insights, updates, and career advice from the Jan Justice team.
+                Latest legal updates, insights, and articles from the Jan Justice team.
               </p>
             </div>
 
