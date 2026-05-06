@@ -91,6 +91,7 @@ const JobDetail = () => {
 
   const hasDynamicTabs = Boolean(job?.tabs && job.tabs.length > 0);
   const hasDynamicSidebar = Boolean(job?.sidebarFields && job.sidebarFields.length > 0);
+  const hasMultipleRoles = Boolean(job?.roles && job.roles.length >= 2);
 
   // Check if dynamic tabs already include a PDF section (avoid duplicate display)
   const tabsHavePdf = job?.tabs?.some(tab =>
@@ -280,6 +281,53 @@ const JobDetail = () => {
                   </div>
                 )}
 
+                {/* Multiple Roles (when admin posted 2+ roles in one job) */}
+                {hasMultipleRoles && (
+                  <div className="bg-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-soft animate-fade-in">
+                    <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                      <h2 className="text-xl font-display font-bold">Available Roles</h2>
+                      <span className="text-xs font-medium text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                        {job.roles!.length} roles in this post
+                      </span>
+                    </div>
+                    <Tabs defaultValue={`role-${0}`} className="w-full">
+                      <TabsList className="w-full justify-start h-auto p-1 bg-muted rounded-xl mb-6 flex-wrap">
+                        {job.roles!.map((role, idx) => {
+                          const postName = role.customInputs?.find(ci => ci.label?.toLowerCase() === 'post name')?.value;
+                          const tabLabel = postName?.trim() || `Role ${idx + 1}`;
+                          return (
+                            <TabsTrigger
+                              key={role.id || idx}
+                              value={`role-${idx}`}
+                              className="rounded-lg data-[state=active]:shadow-sm"
+                            >
+                              {tabLabel}
+                            </TabsTrigger>
+                          );
+                        })}
+                      </TabsList>
+                      {job.roles!.map((role, idx) => (
+                        <TabsContent key={role.id || idx} value={`role-${idx}`} className="space-y-3 animate-fade-in">
+                          {role.customInputs && role.customInputs.length > 0 ? (
+                            <div className="divide-y divide-border/50">
+                              {role.customInputs.map((input, i) => (
+                                <div key={i} className="flex flex-col md:flex-row md:items-start gap-1 md:gap-4 py-3">
+                                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide md:w-40 shrink-0">
+                                    {input.label}
+                                  </p>
+                                  <p className="text-sm text-foreground whitespace-pre-wrap flex-1">{input.value}</p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground italic">No details provided for this role.</p>
+                          )}
+                        </TabsContent>
+                      ))}
+                    </Tabs>
+                  </div>
+                )}
+
                 {/* Dynamic tabs for legacy jobs */}
                 {hasDynamicTabs && (
                   <Tabs defaultValue={job.tabs![0].id} className="w-full">
@@ -434,8 +482,8 @@ const JobDetail = () => {
                       ))
                     )}
 
-                    {/* Additional Details (Custom Inputs) */}
-                    {job.customInputs && job.customInputs.length > 0 && (
+                    {/* Additional Details (Custom Inputs) - hidden when multi-role tabs are shown above */}
+                    {job.customInputs && job.customInputs.length > 0 && !hasMultipleRoles && (
                       <>
                         <div className="border-t border-border/50 pt-4 mt-2">
                           <p className="text-xs text-muted-foreground uppercase font-medium mb-3">Additional Details</p>
