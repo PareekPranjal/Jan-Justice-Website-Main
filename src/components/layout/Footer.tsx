@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Briefcase, GraduationCap, Calendar, Mail, Phone, MapPin, Youtube, Newspaper } from "lucide-react";
+import { Briefcase, GraduationCap, Calendar, Mail, Phone, MapPin, Youtube, Newspaper, Info } from "lucide-react";
 
 const footerLinks = {
   platform: [
@@ -80,9 +80,29 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/40 flex flex-col items-center gap-4">
+        {/* Disclaimer */}
+        <div className="mt-12 pt-8 border-t border-border/40">
+          <div className="rounded-xl bg-muted/40 border border-border/40 p-5 md:p-6">
+            <div className="flex items-start gap-3">
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Info className="h-4 w-4 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-display font-semibold text-foreground text-sm mb-2">Disclaimer</h4>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  This platform and its content are created for educational and informational purposes only.{" "}
+                  <span className="font-medium text-foreground/80">Copyright Disclaimer under Section 107 of the Copyright Act, 1976:</span>{" "}
+                  allowance is made for &ldquo;fair use&rdquo; for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is permitted by copyright statute that might otherwise be infringing. Non-profit, educational, or informational use tips the balance in favor of fair use.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-8 pt-6 border-t border-border/40 flex flex-col items-center gap-4">
           <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground text-center md:text-left">
               © {new Date().getFullYear()} Jan Justice. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
@@ -97,12 +117,12 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground text-center">
             <span>Designed, Developed & Managed by</span>
             <a href="https://www.adrologic.com/" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline transition-colors">
               Adrologic Private Limited
             </a>
-            <span>|</span>
+            <span className="hidden sm:inline">|</span>
             <a href="https://www.adrologic.com/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
               www.adrologic.com
             </a>
