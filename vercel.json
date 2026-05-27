@@ -1,6 +1,4 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "functions": {
     "api/blogs/[id].ts": {
       "includeFiles": "dist/**"
@@ -8,6 +6,6 @@
   },
   "rewrites": [
     { "source": "/blogs/:id", "destination": "/api/blogs/:id" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
