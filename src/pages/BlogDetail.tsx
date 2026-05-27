@@ -1,11 +1,19 @@
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { PageLoader } from "@/components/ui/loader";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { blogApi } from "@/lib/api";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Share2, Link as LinkIcon, MessageCircle, Twitter, Facebook, Linkedin, Mail } from "lucide-react";
 
 const BlogDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +23,57 @@ const BlogDetail = () => {
     queryFn: () => blogApi.getBlogById(id!),
     enabled: Boolean(id),
   });
+
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = blog?.title ?? '';
+  const shareText = blog?.excerpt ?? blog?.title ?? '';
+
+  const handleNativeShare = async () => {
+    if (typeof navigator !== 'undefined' && 'share' in navigator) {
+      try {
+        await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+        return;
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') return;
+      }
+    }
+    await handleCopyLink();
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied to clipboard');
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
+  const openShareWindow = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer,width=600,height=600');
+  };
+
+  const shareTargets = {
+    whatsapp: () =>
+      openShareWindow(
+        `https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${shareUrl}`)}`
+      ),
+    twitter: () =>
+      openShareWindow(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`
+      ),
+    facebook: () =>
+      openShareWindow(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+      ),
+    linkedin: () =>
+      openShareWindow(
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+      ),
+    email: () => {
+      window.location.href = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
+    },
+  };
 
   if (isLoading) return <PageLoader />;
 
@@ -44,6 +103,15 @@ const BlogDetail = () => {
       <Helmet>
         <title>{blog.title} | Jan Justice</title>
         {blog.excerpt && <meta name="description" content={blog.excerpt} />}
+        <meta property="og:title" content={`${blog.title} | Jan Justice`} />
+        {blog.excerpt && <meta property="og:description" content={blog.excerpt} />}
+        <meta property="og:type" content="article" />
+        {blog.image?.url && <meta property="og:image" content={blog.image.url} />}
+        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${blog.title} | Jan Justice`} />
+        {blog.excerpt && <meta name="twitter:description" content={blog.excerpt} />}
+        {blog.image?.url && <meta name="twitter:image" content={blog.image.url} />}
       </Helmet>
       <div className="bg-background min-h-screen flex flex-col">
         <Header />
@@ -63,17 +131,51 @@ const BlogDetail = () => {
               {blog.title}
             </h1>
 
-            {/* Meta */}
-            {blog.createdAt && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-                <Calendar className="h-4 w-4" />
-                {new Date(blog.createdAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </div>
-            )}
+            {/* Meta + share */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+              {blog.createdAt ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  {new Date(blog.createdAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </div>
+              ) : <span />}
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="default" className="gap-2">
+                    <Share2 className="h-4 w-4" />
+                    Share
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleNativeShare} className="gap-2">
+                    <Share2 className="h-4 w-4" /> Share via…
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareTargets.whatsapp} className="gap-2">
+                    <MessageCircle className="h-4 w-4" /> WhatsApp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareTargets.twitter} className="gap-2">
+                    <Twitter className="h-4 w-4" /> Twitter / X
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareTargets.facebook} className="gap-2">
+                    <Facebook className="h-4 w-4" /> Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareTargets.linkedin} className="gap-2">
+                    <Linkedin className="h-4 w-4" /> LinkedIn
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareTargets.email} className="gap-2">
+                    <Mail className="h-4 w-4" /> Email
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyLink} className="gap-2">
+                    <LinkIcon className="h-4 w-4" /> Copy link
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             {/* Cover image */}
             {blog.image?.url && (
