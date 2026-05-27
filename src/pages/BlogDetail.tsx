@@ -25,13 +25,14 @@ const BlogDetail = () => {
   });
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareUrlSocial = shareUrl + (shareUrl.includes('?') ? '&' : '?') + 's=2';
   const shareTitle = blog?.title ?? '';
   const shareText = blog?.excerpt ?? blog?.title ?? '';
 
   const handleNativeShare = async () => {
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
-        await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+        await navigator.share({ title: shareTitle, text: shareText, url: shareUrlSocial });
         return;
       } catch (err) {
         if ((err as Error)?.name === 'AbortError') return;
@@ -56,19 +57,19 @@ const BlogDetail = () => {
   const shareTargets = {
     whatsapp: () =>
       openShareWindow(
-        `https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${shareUrl}`)}`
+        `https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${shareUrlSocial}`)}`
       ),
     twitter: () =>
       openShareWindow(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrlSocial)}`
       ),
     facebook: () =>
       openShareWindow(
-        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrlSocial)}`
       ),
     linkedin: () =>
       openShareWindow(
-        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrlSocial)}`
       ),
     email: () => {
       window.location.href = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`;
